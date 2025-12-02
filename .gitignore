@@ -1,11 +1,12 @@
-.env
-
-.hive-metastore
-.kafka_data
-.minio_anomalies
-.spark_warehouse
-.zookeeper
+volumes/
 .venv
 docs
 
 airflow/logs
+
+*.env
+.env.*
+envs/
+
+!envs/.env.example
+!/.env.example

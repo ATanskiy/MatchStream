@@ -3,6 +3,9 @@
 
 # Exit immediately if any command fails
 set -e
+set -o pipefail
+set -o errexit
+set -o nounset
 
 echo "=== PostgreSQL Initialization Script Starting ==="
 
