@@ -10,3 +10,5 @@ envs/
 
 !envs/.env.example
 !/.env.example
+
+__pycache__/

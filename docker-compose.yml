@@ -1,4 +1,3 @@
-version: "3.7"
 services:
 
   # --------------------
@@ -113,9 +112,9 @@ services:
 
   pg_replica:
     image: postgres:17
-    container_name: pg_reader
+    container_name: pg_replica
     env_file:
-      - envs/.env.pg_reader
+      - envs/.env.pg_replica
     ports:
       - "5436:5432"
     volumes:
@@ -267,10 +266,10 @@ services:
     # Python container
   python-app:
     build:
-      context: .                  # root of your project
-      dockerfile: docker/docker_files/Dockerfile.python
+      context: .
+      dockerfile: matchstream_app/Dockerfile.python
     container_name: python-matchstream
-    working_dir: /app
+    working_dir: /app/matchstream_app
     environment:
       PYTHONPATH: /app
     networks:
