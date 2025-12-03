@@ -156,14 +156,16 @@ services:
     mem_reservation: 6g
     volumes:
       - ./volumes/.spark_warehouse:/spark-warehouse
-      - ./configs/spark/spark-defaults.conf:/opt/spark/conf/spark-defaults.conf
-      - ./configs/spark/hive-site.xml:/opt/spark/conf/hive-site.xml
+      - ./configs/spark_iceberg/spark-defaults.conf:/opt/spark/conf/spark-defaults.conf
+      - ./configs/spark_iceberg/hive-site.xml:/opt/spark/conf/hive-site.xml
       - ./configs:/opt/streaming/configs
       - ./jobs:/opt/streaming/jobs
     env_file:
       - envs/.env.spark
       - envs/.env.pg_meta_db
       - envs/.env.minio
+      - envs/.env.pg_writer
+      - envs/.env.kafka
     depends_on:
       - hive-metastore
       - kafka_broker
