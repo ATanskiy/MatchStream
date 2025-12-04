@@ -1,13 +1,10 @@
-import requests, string, secrets
+import requests, string, secrets, random
 from uuid import uuid4
 from datetime import datetime
 
-from matchstream_app.data_models.user import User
-from matchstream_app.user_generator.cities_loader import CitiesLoader
-from matchstream_app.config.settings import US_CITIES_CSV_PATH
-
-import random
-
+from utils.user import User
+from generator.cities_loader import CitiesLoader
+from config.settings import US_CITIES_CSV_PATH
 
 class UserGenerator:
     def __init__(self):

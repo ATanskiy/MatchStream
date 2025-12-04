@@ -1,7 +1,4 @@
 from dataclasses import asdict
-from uuid import UUID
-from datetime import datetime
-
 
 def user_to_dict(user):
     d = asdict(user)

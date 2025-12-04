@@ -145,8 +145,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/docker_files/Dockerfile.spark_streaming
-    container_name: spark
-    working_dir: /opt/streaming
+    container_name: spark_streaming
+    working_dir: /opt/streaming/jobs
     tmpfs:
       - /tmp:size=4G,exec
     ports:
@@ -164,7 +164,6 @@ services:
       - envs/.env.spark
       - envs/.env.pg_meta_db
       - envs/.env.minio
-      - envs/.env.pg_writer
       - envs/.env.kafka
     depends_on:
       - hive-metastore
@@ -266,18 +265,18 @@ services:
       - matchstream
 
     # Python container
-  python-app:
+  python_user_generator:
     build:
-      context: .
-      dockerfile: matchstream_app/Dockerfile.python
-    container_name: python-matchstream
-    working_dir: /app/matchstream_app
+      context: ./matchstream_app
+      dockerfile: user_generator/Dockerfile.user_generator
+    container_name: python-user-generator
+    working_dir: /app/user_generator
     environment:
-      PYTHONPATH: /app
+      PYTHONPATH: /app/user_generator
     networks:
       - matchstream
     volumes:
-      - .:/app
+      - ./matchstream_app:/app
     tty: true
     stdin_open: true
     depends_on:

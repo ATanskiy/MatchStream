@@ -1,12 +1,11 @@
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Producer Settings
 US_CITIES_CSV_PATH = os.path.join(
     BASE_DIR,
-    "matchstream_app",
-    "us_cities_csv",
+    "us_cities",
     "uscities.csv"
 )
 

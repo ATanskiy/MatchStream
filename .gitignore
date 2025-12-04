@@ -3,6 +3,7 @@ volumes/
 docs
 
 airflow/logs
+airflow/logs/**
 
 *.env
 .env.*

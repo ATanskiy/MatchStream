@@ -5,6 +5,7 @@ from pyspark.sql.functions import col, from_json, to_timestamp, to_date
 
 
 
+
 from configs.spark_streaming.configs import (
     USER_SCHEMA,
     BRONZE_CHECKPOINT,
@@ -101,7 +102,7 @@ def main():
         .format("kafka")
         .option("kafka.bootstrap.servers", KAFKA_BOOTSTRAP)
         .option("subscribe", KAFKA_TOPIC_USERS)
-        .option("startingOffsets", "earliest")
+        .option("startingOffsets", "latest")
         .load()
     )
 

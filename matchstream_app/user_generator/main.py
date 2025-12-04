@@ -1,7 +1,7 @@
 import time
-from matchstream_app.user_generator.user_generator import UserGenerator
-from matchstream_app.prod_ingestion.kafka_producer import UserKafkaProducer
-from matchstream_app.utils.serializer import user_to_dict
+from generator.user_generator import UserGenerator
+from kafka_producer.kafka_producer import UserKafkaProducer
+from utils.serializer import user_to_dict
 
 def run():
     generator = UserGenerator()

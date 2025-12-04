@@ -1,7 +1,7 @@
 import json
 from kafka import KafkaProducer
 
-from matchstream_app.config.settings import (
+from config.settings import (
     KAFKA_BOOTSTRAP_SERVERS,
     KAFKA_USERS_TOPIC
 )
