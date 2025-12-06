@@ -1,0 +1,22 @@
+FROM python:3.11-slim
+
+WORKDIR /workspace
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy and install requirements
+COPY /dbt_matchstream/requirements.txt .
+RUN pip install -r requirements.txt
+
+# Verify the installation works
+RUN python -c "import dbt.adapters.spark; print('dbt-spark adapter installed successfully')"
+RUN python -c "import dbt.include.spark; print('dbt-spark macros found')"
+
+# Set environment
+ENV DBT_PROFILES_DIR=/workspace
+
+CMD ["bash"]

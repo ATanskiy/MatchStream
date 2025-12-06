@@ -301,6 +301,44 @@ services:
     depends_on:
       - postgres
 
+  # --------------------
+  # Spark Thrift & DBT
+  # --------------------
+  spark_thriftserver:
+    build:
+      context: .
+      dockerfile: ./docker/docker_files/Dockerfile.spark_thriftserver
+    container_name: spark-thriftserver
+    hostname: spark-thriftserver
+    ports:
+      - "10000:10000"  # Thrift server for dbt JDBC
+      - "4043:4040"    # Spark UI
+    volumes:
+      - ./configs/spark_iceberg/spark-defaults.conf:/opt/spark/conf/spark-defaults.conf
+      - ./configs/spark_iceberg/hive-site.xml:/opt/spark/conf/hive-site.xml
+    env_file:
+      - ./envs/.env.spark_thriftserver
+      - ./envs/.env.minio
+    command: ["/start_thrift.sh"]
+    networks:
+      - matchstream
+
+  dbt_spark:
+    build:
+      context: .
+      dockerfile: ./dbt_matchstream/Dockerfile.dbt_matchstream
+    container_name: dbt_spark
+    volumes:
+      - ./dbt_matchstream:/workspace
+    environment:
+      DBT_PROFILES_DIR: /workspace
+    networks:
+      - matchstream
+    depends_on:
+      - spark_thriftserver
+    tty: true
+    stdin_open: true
+
 networks:
   matchstream:
     driver: bridge
