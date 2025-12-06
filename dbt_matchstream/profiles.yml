@@ -1,0 +1,12 @@
+dbt_matchstream:
+  target: dev
+  outputs:
+    dev:
+      type: spark
+      method: thrift
+      host: spark-thriftserver
+      port: 10001
+      catalog: matchstream
+      schema: matchstream.silver
+      threads: 10
+      auth: NOSASL

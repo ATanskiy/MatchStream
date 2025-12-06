@@ -31,10 +31,5 @@ USER_SCHEMA = StructType([
 ])
 
 BRONZE_CHECKPOINT = "s3a://default/checkpoints/bronze_users"
-WRITER_CHECKPOINT = "s3a://default/checkpoints/pg_users"
-
+BRONZE_TABLE_USERS = "matchstream.bronze.users_raw"
 KAFKA_TOPIC_USERS = "users"
-
-BRONZE_TABLE_USERS = "bronze.users_raw"
-
-WRITER_STREAM_TABLE = "matchstream.users"

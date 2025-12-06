@@ -58,6 +58,20 @@ try:
 except Exception as e:
     print(f"Note: {e}")
 
+try:
+    spark.sql("""
+        CREATE TABLE IF NOT EXISTS matchstream.bronze.users_raw (
+            event_id   string,
+            json_raw   string,
+            inserted_at timestamp
+        )
+        USING iceberg
+        PARTITIONED BY (day(inserted_at))
+    """)
+    print("✓ Created table matchstream.bronze.users_raw")
+except Exception as e:
+    print(f"Note: {e}")  
+
 # show created namespaces
 namespaces = spark.sql("SHOW NAMESPACES IN matchstream")
 print("\nAvailable namespaces:")

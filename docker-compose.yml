@@ -62,7 +62,7 @@ services:
       - envs/.env.pg_meta_db
     volumes:
       - ./volumes/.pg_meta_db:/var/lib/postgresql/data
-      - ./docker/scripts/airflow_db_init.sh:/docker-entrypoint-initdb.d/init-db.sh
+      - ./docker/scripts/airflow/airflow_db_init.sh:/docker-entrypoint-initdb.d/init-db.sh
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d metastore_db"]
       interval: 5s
@@ -201,6 +201,7 @@ services:
     image: apache/airflow:2.8.1
     container_name: airflow_webserver
     depends_on:
+      - postgres
       - airflow-scheduler
     ports:
       - "8085:8080"
@@ -214,6 +215,8 @@ services:
       - ./configs:/opt/airflow/configs
       - ./envs/.env.airflow:/opt/airflow/.env.airflow
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker/scripts/airflow/airflow_bootstrap.sh:/opt/airflow/airflow-bootstrap.sh
+    entrypoint: ["/opt/airflow/airflow-bootstrap.sh"]
     networks:
       - matchstream
     command: webserver
@@ -244,7 +247,7 @@ services:
       - envs/.env.minio
     entrypoint: ["/bin/sh", "/scripts/init.sh"]
     volumes:
-    - ./docker/scripts/minio_buckets_init.sh:/scripts/init.sh:ro
+    - ./docker/scripts/minio/minio_buckets_init.sh:/scripts/init.sh:ro
     networks:
       - matchstream
 
@@ -300,6 +303,45 @@ services:
     stdin_open: true
     depends_on:
       - postgres
+
+  # --------------------
+  # Spark Thrift & DBT
+  # --------------------
+  spark_thriftserver:
+    build:
+      context: .
+      dockerfile: ./docker/docker_files/Dockerfile.spark_thriftserver
+    container_name: spark-thriftserver
+    hostname: spark-thriftserver
+    ports:
+      - "10000:10000"
+      - "10001:10001"  # Thrift server for dbt JDBC
+      - "4043:4040"    # Spark UI
+    volumes:
+      - ./configs/spark_thrift/spark-defaults.conf:/opt/spark/conf/spark-defaults.conf
+      - ./configs/spark_iceberg/hive-site.xml:/opt/spark/conf/hive-site.xml
+    env_file:
+      - ./envs/.env.spark_thriftserver
+      - ./envs/.env.minio
+    command: ["/start_thrift.sh"]
+    networks:
+      - matchstream
+
+  dbt_spark:
+    build:
+      context: .
+      dockerfile: ./dbt_matchstream/Dockerfile.dbt_matchstream
+    container_name: dbt_spark
+    volumes:
+      - ./dbt_matchstream:/workspace
+    environment:
+      DBT_PROFILES_DIR: /workspace
+    networks:
+      - matchstream
+    depends_on:
+      - spark_thriftserver
+    tty: true
+    stdin_open: true
 
 networks:
   matchstream:
