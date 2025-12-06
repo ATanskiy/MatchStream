@@ -3,6 +3,7 @@ volumes/
 docs
 
 airflow/logs
+airflow/logs/**
 
 *.env
 .env.*
@@ -10,3 +11,5 @@ envs/
 
 !envs/.env.example
 !/.env.example
+
+__pycache__/
