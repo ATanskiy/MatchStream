@@ -1,8 +1,4 @@
-import os
-import sys
-import signal
-import traceback
-
+import os, sys, signal, traceback
 sys.path.append("/opt/streaming")
 
 from pyspark.sql import SparkSession
@@ -32,6 +28,7 @@ def create_spark_session():
     spark = (
         SparkSession.builder
         .appName("MatchStreamUsersIngestion")
+        .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")
         .config("spark.sql.catalog.matchstream", "org.apache.iceberg.spark.SparkCatalog")
         .config("spark.sql.catalog.matchstream.type", CATALOG_TYPE)
         .config("spark.sql.catalog.matchstream.uri", THRIFT_HIVE_METASTORE)
@@ -48,21 +45,25 @@ def create_spark_session():
     return spark
 
 
-# -------------------------------------------------------------------
-# DEBUG BATCH
-# -------------------------------------------------------------------
-def debug_batch(df, batch_id):
+# ------------------------------------------------------------
+# WRITE TO ICEBERG (foreachBatch)
+# ------------------------------------------------------------
+def write_to_iceberg(df, batch_id):
     try:
+        row_count = df.count()
         print("=" * 80)
-        print(f"🔥 Batch: {batch_id}")
-
-        count = df.count()
-        print(f"Rows: {count}")
-
+        print(f"🔥 Writing batch {batch_id} → Iceberg table: {BRONZE_TABLE_USERS}")
+        print(f"Rows: {row_count}")
         print("=" * 80)
+
+        if row_count > 0:
+            (
+                df.writeTo(BRONZE_TABLE_USERS)
+                .append()
+            )
 
     except Exception:
-        print("❌ ERROR during debug_batch()")
+        print("❌ ERROR in write_to_iceberg()")
         traceback.print_exc()
 
 
@@ -97,54 +98,59 @@ def _shutdown(*args):
     sys.exit(0)
 
 
-# -------------------------------------------------------------------
+# ------------------------------------------------------------
 # MAIN JOB
-# -------------------------------------------------------------------
+# ------------------------------------------------------------
 def main():
     global _SPARK, _ACTIVE_QUERIES
 
-    # Bind Ctrl+C + Docker stop
+    # handle termination
     signal.signal(signal.SIGINT, _shutdown)
     signal.signal(signal.SIGTERM, _shutdown)
 
     spark = create_spark_session()
     _SPARK = spark
 
-    # --- Read from Kafka ---
+    # --------------------------------------------------------
+    # STREAM READ FROM KAFKA
+    # --------------------------------------------------------
     kafka_df = (
         spark.readStream
         .format("kafka")
         .option("kafka.bootstrap.servers", KAFKA_BOOTSTRAP)
         .option("subscribe", KAFKA_TOPIC_USERS)
-        .option("startingOffsets", "latest")
+        .option("startingOffsets", "earliest")
         .load()
     )
 
     value_df = kafka_df.selectExpr("CAST(value AS STRING) AS json_str")
 
-    # --- Bronze Table ---
+    # --------------------------------------------------------
+    # BRONZE STRUCTURE
+    # --------------------------------------------------------
     bronze_df = value_df.selectExpr(
         "uuid() AS event_id",
         "json_str AS json_raw",
         "current_timestamp() AS inserted_at"
     )
 
-    # --- Write stream (Iceberg + debug) ---
+    # --------------------------------------------------------
+    # STREAM WRITE → ICEBERG
+    # --------------------------------------------------------
     bronze_query = (
         bronze_df.writeStream
-        .format("iceberg")
-        .foreachBatch(debug_batch)
+        .foreachBatch(write_to_iceberg)
         .option("checkpointLocation", BRONZE_CHECKPOINT)
         .queryName("bronze_users_raw_writer")
         .trigger(processingTime="10 seconds")
-        .start(BRONZE_TABLE_USERS)
+        .start()
     )
 
     _ACTIVE_QUERIES.append(bronze_query)
 
-    print("🔥 Bronze stream started!")
+    print("🔥 Bronze stream started! Writing to Iceberg via foreachBatch…")
 
-    # Keep the process alive
+    # keep process alive
     while _RUNNING:
         spark.streams.awaitAnyTermination(5)
 

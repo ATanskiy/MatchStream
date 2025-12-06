@@ -25,6 +25,7 @@ create_bucket() {
 
 # Check or create buckets
 create_bucket default
+create_bucket hive
 create_bucket matchstream
 
 echo "Bucket initialization completed."

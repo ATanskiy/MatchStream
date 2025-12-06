@@ -20,7 +20,7 @@ class UserGenerator:
         alphabet = string.ascii_letters + string.digits
         return ''.join(secrets.choice(alphabet) for _ in range(length))
 
-    def generate_users(self, min_users=2, max_users=15):
+    def generate_users(self, min_users=5, max_users=35):
         num = random.randint(min_users, max_users)
         raw_users = self.fetch_random_users(num)
 

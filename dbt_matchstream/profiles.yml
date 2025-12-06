@@ -5,7 +5,8 @@ dbt_matchstream:
       type: spark
       method: thrift
       host: spark-thriftserver
-      port: 10000
-      schema: default
+      port: 10001
+      catalog: matchstream
+      schema: matchstream.silver
       threads: 10
       auth: NOSASL
