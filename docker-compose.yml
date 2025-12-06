@@ -264,7 +264,7 @@ services:
     networks:
       - matchstream
 
-    # Python container
+  # User generator python container
   python_user_generator:
     build:
       context: ./matchstream_app
@@ -273,6 +273,25 @@ services:
     working_dir: /app/user_generator
     environment:
       PYTHONPATH: /app/user_generator
+    networks:
+      - matchstream
+    volumes:
+      - ./matchstream_app:/app
+    tty: true
+    stdin_open: true
+    depends_on:
+      - postgres
+
+
+    # User generator python container
+  python_user_ingestor_to_writer:
+    build:
+      context: ./matchstream_app
+      dockerfile: user_ingestor_to_writer/Dockerfile.user_ingestor_to_writer
+    container_name: python_user_ingestor_to_writer
+    working_dir: /app/user_ingestor_to_writer
+    environment:
+      PYTHONPATH: /app/user_ingestor_to_writer
     networks:
       - matchstream
     volumes:

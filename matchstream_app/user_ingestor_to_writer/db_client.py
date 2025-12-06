@@ -3,7 +3,7 @@
 import psycopg2
 from psycopg2.extensions import connection as PgConnection
 
-from matchstream_app.user_ingestion_writer.settings import WRITER_DB_URL, WRITER_DB_USER, WRITER_DB_PASSWORD
+from settings import WRITER_DB_URL, WRITER_DB_USER, WRITER_DB_PASSWORD
 
 
 class PostgresClient:

@@ -1,6 +1,6 @@
 from typing import Iterable, Mapping
 from psycopg2.extras import execute_values
-from .db_client import PostgresClient
+from db_client import PostgresClient
 
 
 class UserRepository:

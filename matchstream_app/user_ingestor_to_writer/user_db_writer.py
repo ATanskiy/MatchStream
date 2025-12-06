@@ -7,12 +7,9 @@ from typing import List
 
 from kafka import KafkaConsumer
 
-from matchstream_app.user_ingestion_writer.settings import (
-    KAFKA_BOOTSTRAP_SERVERS,
-    KAFKA_USERS_TOPIC,
-)
-from .db_client import PostgresClient
-from .user_repository import UserRepository
+from settings import KAFKA_BOOTSTRAP_SERVERS, KAFKA_USERS_TOPIC
+from db_client import PostgresClient
+from user_repository import UserRepository
 
 
 class UserDbWriterService:
