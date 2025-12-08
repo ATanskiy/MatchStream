@@ -301,7 +301,7 @@ services:
     build:
       context: ./matchstream_app
       dockerfile: user_generator/Dockerfile.user_generator
-    container_name: python-user-generator
+    container_name: python_user_generator
     working_dir: /app/user_generator
     environment:
       PYTHONPATH: /app/user_generator

@@ -1,6 +1,4 @@
 import signal
-import json
-from kafka import KafkaConsumer
 
 class UserDbWriterService:
 

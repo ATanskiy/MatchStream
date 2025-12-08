@@ -1,24 +1,25 @@
-# Use slim Python 3.12 as base
+# Base image
 FROM python:3.11-slim
 
-# Set working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Install system dependencies (needed for psycopg2 and some Python libs)
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
     libpq-dev \
     python3-dev \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first (so Docker can cache pip layer)
-COPY user_generator/requirements.txt .
+# Install Python libraries directly (NO requirements.txt needed)
+RUN pip install --no-cache-dir \
+    kafka-python==2.2.2 \
+    psycopg2-binary==2.9.9 \
+    python-dotenv==1.0.1
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy your project code
+# Copy project code
 COPY . .
 
-# Default command (keeps container alive and ready)
+# Default command: keep container alive until Airflow triggers the process
 CMD ["tail", "-f", "/dev/null"]
