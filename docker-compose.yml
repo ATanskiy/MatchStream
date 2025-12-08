@@ -52,22 +52,21 @@ services:
   # --------------------
   # Postgres, Hive Metastore 
   # --------------------
-  postgres:
+  pg_hive_db:
     image: 'postgres:17'
     hostname: postgres
-    container_name: pg_meta_db
+    container_name: pg_hive_db
     ports:
       - '5434:5432'
     env_file:
-      - envs/.env.pg_meta_db
+      - envs/.env.pg_hive_db
     volumes:
-      - ./volumes/.pg_meta_db:/var/lib/postgresql/data
-      - ./docker/scripts/airflow/airflow_db_init.sh:/docker-entrypoint-initdb.d/init-db.sh
+      - ./volumes/.pg_hive_db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d metastore_db"]
+      test: ["CMD-SHELL", "pg_isready -h localhost -p 5432 -U admin -d metastore_db"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 20
     networks:
       - matchstream
 
@@ -78,13 +77,18 @@ services:
     ports:
       - '9083:9083' # Metastore Thrift
     env_file:
-      - envs/.env.hive-metastore
+      - envs/.env.pg_hive_db
       - envs/.env.minio
     depends_on:
-      postgres:
+      pg_hive_db:
         condition: service_healthy
       minio:
         condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/9083'"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     networks:
       - matchstream
 
@@ -141,7 +145,7 @@ services:
   # --------------------
   # Spark Streaming
   # --------------------
-  spark:
+  spark_streaming:
     build:
       context: .
       dockerfile: ./docker/docker_files/Dockerfile.spark_streaming
@@ -161,8 +165,8 @@ services:
       - ./configs:/opt/streaming/configs
       - ./jobs:/opt/streaming/jobs
     env_file:
-      - envs/.env.spark
-      - envs/.env.pg_meta_db
+      - envs/.env.spark_streaming
+      - envs/.env.pg_hive_db
       - envs/.env.minio
       - envs/.env.kafka
     depends_on:
@@ -177,10 +181,28 @@ services:
   # --------------------
   # Airflow
   # --------------------
+  pg_airflow_db:
+    image: 'postgres:17'
+    container_name: pg_airflow_db
+    ports:
+      - '5437:5432'
+    env_file:
+      - envs/.env.pg_airflow_db
+    volumes:
+      - ./volumes/.pg_airflow_db:/var/lib/postgresql/data
+      - ./docker/scripts/airflow/airflow_db_init.sh:/docker-entrypoint-initdb.d/init-db.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d airflow || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+    networks:
+      - matchstream
+
   airflow-scheduler:
-    image: apache/airflow:2.8.1
+    image: apache/airflow:2.10.1-python3.11
     depends_on:
-      postgres:
+      pg_airflow_db:
         condition: service_healthy
     container_name: airflow_scheduler
     env_file:
@@ -193,16 +215,24 @@ services:
       - ./configs:/opt/airflow/configs
       - ./envs/.env.airflow:/opt/airflow/.env.airflow
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker/scripts/airflow/airflow_scheduler_entrypoint.sh:/opt/airflow/airflow_scheduler_entrypoint.sh
     networks:
       - matchstream
-    command: scheduler
+    healthcheck:
+      test: ["CMD", "airflow", "jobs", "check", "--job-type", "SchedulerJob"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    entrypoint: ["/opt/airflow/airflow_scheduler_entrypoint.sh"]
 
   airflow-webserver:
-    image: apache/airflow:2.8.1
+    image: apache/airflow:2.10.1-python3.11
     container_name: airflow_webserver
     depends_on:
-      - postgres
-      - airflow-scheduler
+      pg_airflow_db:
+        condition: service_healthy
+      airflow-scheduler:
+        condition: service_healthy
     ports:
       - "8085:8080"
     env_file:
@@ -215,11 +245,10 @@ services:
       - ./configs:/opt/airflow/configs
       - ./envs/.env.airflow:/opt/airflow/.env.airflow
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./docker/scripts/airflow/airflow_bootstrap.sh:/opt/airflow/airflow-bootstrap.sh
-    entrypoint: ["/opt/airflow/airflow-bootstrap.sh"]
+      - ./docker/scripts/airflow/airflow_webserver_entrypoint.sh:/opt/airflow/airflow_webserver_entrypoint.sh
+    entrypoint: ["/opt/airflow/airflow_webserver_entrypoint.sh"]
     networks:
       - matchstream
-    command: webserver
 
   # --------------------
   # MinIO
@@ -272,7 +301,7 @@ services:
     build:
       context: ./matchstream_app
       dockerfile: user_generator/Dockerfile.user_generator
-    container_name: python-user-generator
+    container_name: python_user_generator
     working_dir: /app/user_generator
     environment:
       PYTHONPATH: /app/user_generator
@@ -282,9 +311,6 @@ services:
       - ./matchstream_app:/app
     tty: true
     stdin_open: true
-    depends_on:
-      - postgres
-
 
     # User generator python container
   python_user_ingestor_to_writer:
@@ -302,7 +328,7 @@ services:
     tty: true
     stdin_open: true
     depends_on:
-      - postgres
+      - pg_writer
 
   # --------------------
   # Spark Thrift & DBT
@@ -324,6 +350,9 @@ services:
       - ./envs/.env.spark_thriftserver
       - ./envs/.env.minio
     command: ["/start_thrift.sh"]
+    depends_on:
+      hive-metastore:
+        condition: service_healthy
     networks:
       - matchstream
 

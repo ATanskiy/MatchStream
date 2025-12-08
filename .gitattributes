@@ -1,0 +1,8 @@
+# Force shell scripts to always use LF
+*.sh text eol=lf
+
+# Optional: keep Docker files LF as well
+Dockerfile text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.env text eol=lf
