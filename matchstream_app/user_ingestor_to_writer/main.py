@@ -1,3 +1,6 @@
+import sys
+sys.stdout.flush()
+
 import json
 from kafka import KafkaConsumer
 
@@ -38,9 +41,11 @@ def build_service():
 
 
 def main():
-    service = build_service()
-    service.run()
-
+    try:
+        service = build_service()
+        service.run()
+    except KeyboardInterrupt:
+        print("Shutting down gracefully...")
 
 if __name__ == "__main__":
     main()
