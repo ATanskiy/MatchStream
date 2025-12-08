@@ -145,7 +145,7 @@ services:
   # --------------------
   # Spark Streaming
   # --------------------
-  spark:
+  spark_streaming:
     build:
       context: .
       dockerfile: ./docker/docker_files/Dockerfile.spark_streaming
@@ -165,7 +165,7 @@ services:
       - ./configs:/opt/streaming/configs
       - ./jobs:/opt/streaming/jobs
     env_file:
-      - envs/.env.spark
+      - envs/.env.spark_streaming
       - envs/.env.pg_hive_db
       - envs/.env.minio
       - envs/.env.kafka
