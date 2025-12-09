@@ -17,6 +17,7 @@ parsed AS (
         get_json_object(json_raw, '$.gender')        AS gender,
         get_json_object(json_raw, '$.first_name')    AS first_name,
         get_json_object(json_raw, '$.last_name')     AS last_name,
+        get_json_object(json_raw, '$.dob')           AS dob,
         inserted_at
     FROM src
 )

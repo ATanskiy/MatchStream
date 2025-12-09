@@ -7,27 +7,15 @@ WORKDIR /workspace
 RUN pip install --upgrade pip
 
 # Install Python libraries with compatible versions
-RUN pip install \
-    boto3>=1.34.0 \
-    botocore>=1.34.0 \
-    certifi \
-    charset-normalizer \
-    idna \
-    jmespath \
-    kafka-python==2.0.2 \
-    py4j==0.10.9.7 \
-    pyspark==3.5.1 \
-    python-dateutil \
-    pytz \
-    requests \
-    s3transfer \
-    six \
-    urllib3
+RUN pip install --upgrade pip && \
+    pip install \
+        kafka-python==2.0.2 \
+        PyYAML==6.0.2
 
 # Verify the installation works
+# Test only the modules that DO exist during build
 RUN python3 -c "import kafka; print('kafka-python installed successfully')"
-RUN python3 -c "import boto3; print('boto3 installed successfully')"
-RUN python3 -c "import pyspark; print('pyspark installed successfully')"
+RUN python3 -c "import yaml; print('yaml installed successfully')"
 
 # Download Spark/Iceberg/Kafka/S3 jars from Maven Central
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/* && \
@@ -46,7 +34,5 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/* && 
     curl -L -o /opt/spark/jars/spark-token-provider-kafka-0-10_2.12-3.5.1.jar \
       https://repo1.maven.org/maven2/org/apache/spark/spark-token-provider-kafka-0-10_2.12/3.5.1/spark-token-provider-kafka-0-10_2.12-3.5.1.jar && \
     curl -L -o /opt/spark/jars/iceberg-aws-bundle-1.5.2.jar \
-      https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-aws-bundle/1.5.2/iceberg-aws-bundle-1.5.2.jar && \
-    curl -L -o /opt/spark/jars/postgresql-42.7.4.jar \
-      https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.4/postgresql-42.7.4.jar
+      https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-aws-bundle/1.5.2/iceberg-aws-bundle-1.5.2.jar
 CMD ["bash"]

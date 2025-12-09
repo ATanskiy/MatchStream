@@ -1,0 +1,9 @@
+namespaces:
+  - name: bronze
+    location: s3a://matchstream/bronze
+
+  - name: silver
+    location: s3a://matchstream/silver
+
+  - name: gold
+    location: s3a://matchstream/gold

@@ -36,7 +36,7 @@ SELECT
     m.created_at,
     b.inserted_at,
 
-    FLOOR(DATEDIFF(current_date, CAST(m.created_at AS DATE)) / 365) AS age
+    FLOOR(DATEDIFF(current_date, TO_DATE(CAST(b.dob AS TIMESTAMP))) / 365) AS age
 
 FROM b
 LEFT JOIN c ON b.user_id = c.user_id

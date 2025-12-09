@@ -1,0 +1,9 @@
+tables:
+  - namespace: bronze
+    table: users_raw
+    columns:
+      event_id: string
+      json_raw: string
+      inserted_at: timestamp
+    partition_by:
+      - day(inserted_at)

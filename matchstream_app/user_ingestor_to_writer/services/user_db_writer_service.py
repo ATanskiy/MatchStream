@@ -1,4 +1,4 @@
-import signal
+import signal, logging
 
 class UserDbWriterService:
 
@@ -8,9 +8,10 @@ class UserDbWriterService:
         self.repository = repository
         self.batch_size = batch_size
         self._running = True
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     def _stop(self, *_):
-        print("🛑 Stopping service...")
+        self.logger.info("Received stop signal. Shutting down...")
         self._running = False
 
     def _setup_signals(self):
@@ -19,20 +20,20 @@ class UserDbWriterService:
 
     def run(self):
         self._setup_signals()
-        print("🚀 UserDbWriterService started...")
+        self.logger.info("Service started.")
 
         while self._running:
             polled = self.consumer.poll(timeout_ms=1000, max_records=self.batch_size)
+            events = [rec.value for _, recs in polled.items() for rec in recs]
 
-            events = [record.value for _, recs in polled.items() for record in recs]
             if not events:
                 continue
 
             users = [self.mapper.from_event(e) for e in events]
             inserted = self.repository.upsert(users)
 
-            print(f"✅ Inserted {inserted} users")
+            self.logger.info("Inserted %s users", inserted)
             self.consumer.commit()
 
-        print("Closing Kafka consumer...")
+        self.logger.info("Closing Kafka consumer.")
         self.consumer.close()

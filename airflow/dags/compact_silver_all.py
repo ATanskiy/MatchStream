@@ -6,9 +6,9 @@ SPARK_CONTAINER = "spark_streaming"
 
 with DAG(
     dag_id="compact_silver_all",
-    description="Run Iceberg compaction for matchstream.bronze.users_raw",
+    description="Run full Iceberg compaction for matchstream.silver tables",
     start_date=datetime(2025, 1, 1),
-    schedule=None,   # run manually, like your example
+    schedule=None,
     catchup=False,
     tags=["matchstream", "iceberg", "spark", "compaction"],
 ):
@@ -16,7 +16,8 @@ with DAG(
     run_compaction = BashOperator(
         task_id="run_compaction",
         bash_command=(
-            "docker exec spark_streaming "
-            "/opt/spark/bin/spark-submit /opt/streaming/jobs/compact_silver_all.py"
-        )
+            f"docker exec {SPARK_CONTAINER} "
+            "/opt/spark/bin/spark-submit "
+            "/opt/streaming/jobs/main.py --job compact_silver_all"
+        ) + " || true"
     )

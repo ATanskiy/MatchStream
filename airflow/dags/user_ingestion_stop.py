@@ -15,11 +15,16 @@ with DAG(
 
     stop_ingestor = BashOperator(
         task_id="stop_ingestor",
-        bash_command=f'''
-            docker exec {CONTAINER_NAME} sh -c "
-                pkill -f /app/user_ingestor_to_writer/main.py \
-                && echo '✔ stopped' \
-                || echo 'ℹ already stopped'
-            " || true
-        '''
+        bash_command=f"""
+            (
+                echo '--- Checking running processes ---';
+                docker exec {CONTAINER_NAME} ps -ef | grep user_ingestor_to_writer | grep -v grep \
+                    || echo 'No matching process';
+
+                echo '--- Attempting kill ---';
+                docker exec {CONTAINER_NAME} pkill -f /app/user_ingestor_to_writer/main.py 2>&1 \
+                    && echo '✔ Process killed' \
+                    || echo 'ℹ No running process';
+            ) || true
+        """
     )
