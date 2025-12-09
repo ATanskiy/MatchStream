@@ -321,14 +321,17 @@ services:
     working_dir: /app/user_ingestor_to_writer
     environment:
       PYTHONPATH: /app/user_ingestor_to_writer
-    networks:
-      - matchstream
+    env_file:
+      - envs/.env.kafka
+      - envs/.env.pg_writer
     volumes:
       - ./matchstream_app:/app
     tty: true
     stdin_open: true
     depends_on:
       - pg_writer
+    networks:
+      - matchstream
 
   # --------------------
   # Spark Thrift & DBT

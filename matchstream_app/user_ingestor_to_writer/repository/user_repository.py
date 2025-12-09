@@ -1,6 +1,7 @@
 from models.user import User
 from db.db_client import PostgresClient
 
+
 class UserRepository:
     def __init__(self, client: PostgresClient, table: str = "matchstream.users"):
         self.client = client
