@@ -16,8 +16,7 @@ class CompactionEngine:
             CALL matchstream.system.rewrite_data_files(
                 table => '{table}',
                 strategy => 'binpack',
-                options => map('target-file-size-bytes', '134217728')
-            )
+                options => map('target-file-size-bytes', '134217728'))
         """).show(truncate=False)
         self._gc()
 
@@ -31,8 +30,7 @@ class CompactionEngine:
         print(f"🕒 Expiring snapshots older than {ts}")
         self.spark.sql(f"""
             CALL matchstream.system.expire_snapshots(
-                table => '{table}', older_than => TIMESTAMP '{ts}'
-            )
+                table => '{table}', older_than => TIMESTAMP '{ts}')
         """).show()
         self._gc()
 

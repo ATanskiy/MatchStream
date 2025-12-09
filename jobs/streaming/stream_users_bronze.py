@@ -18,6 +18,7 @@ class StreamUsersBronze(SparkApp):
             .format("kafka")
             .option("kafka.bootstrap.servers", self.config.kafka_bootstrap)
             .option("subscribe", self.config.kafka_users_topic)
+            .option("startingOffsets", "earliest")
             .load()
             .selectExpr(
                 "uuid() AS event_id",

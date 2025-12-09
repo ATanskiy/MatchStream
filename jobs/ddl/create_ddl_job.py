@@ -33,7 +33,6 @@ class CreateDDLJob(SparkApp):
 
         loc = f" LOCATION '{location}'" if location else ""
         self.log.info(f"Creating namespace matchstream.{name}")
-
         self.spark.sql(f"CREATE NAMESPACE IF NOT EXISTS matchstream.{name}{loc}")
 
     # -------------------------
@@ -45,21 +44,16 @@ class CreateDDLJob(SparkApp):
             return
 
         col_defs = ",\n".join([f"{name} {dtype}" for name, dtype in columns.items()])
-
         part_stmt = ""
         if partitions:
             part_expr = ", ".join(partitions)
             part_stmt = f" PARTITIONED BY ({part_expr})"
-
         self.log.info(f"Creating table matchstream.{ns}.{table}")
-
         self.spark.sql(f"""
             CREATE TABLE IF NOT EXISTS matchstream.{ns}.{table} (
-                {col_defs}
-            )
+                {col_defs})
             USING iceberg
-            {part_stmt}
-        """)
+            {part_stmt}""")
 
     # -------------------------
     # Run logic
@@ -79,7 +73,5 @@ class CreateDDLJob(SparkApp):
                 ns=t["namespace"],
                 table=t["table"],
                 columns=t["columns"],
-                partitions=t.get("partition_by")
-            )
-
+                partitions=t.get("partition_by"))
         self.log.info("DDL creation completed.")
