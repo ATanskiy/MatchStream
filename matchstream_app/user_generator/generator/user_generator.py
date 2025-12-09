@@ -1,37 +1,40 @@
-import requests, string, secrets, random
+import requests, random, secrets, string, logging
 from uuid import uuid4
 from datetime import datetime
-
-from utils.user import User
 from generator.cities_loader import CitiesLoader
-from config.settings import US_CITIES_CSV_PATH
+from utils.user import User
+from config.settings import US_CITIES_CSV_PATH, RANDOMUSER_URL
+
+logger = logging.getLogger(__name__)
 
 class UserGenerator:
+
     def __init__(self):
         self.cities = CitiesLoader(US_CITIES_CSV_PATH)
+        self.RANDOMUSER_URL = RANDOMUSER_URL
 
-    def fetch_random_users(self, count: int):
-        url = f"https://randomuser.me/api/?nat=us&results={count}"
-        response = requests.get(url)
+    def _fetch_users(self, count):
+        logger.info(f"Fetching {count} users from RandomUser API")
+        response = requests.get(self.RANDOMUSER_URL + str(count))
         response.raise_for_status()
-        return response.json()["results"]
-    
-    def generate_password(self, length=12):
-        alphabet = string.ascii_letters + string.digits
-        return ''.join(secrets.choice(alphabet) for _ in range(length))
+        return response.json().get("results", [])
 
-    def generate_users(self, min_users=5, max_users=35):
-        num = random.randint(min_users, max_users)
-        raw_users = self.fetch_random_users(num)
+    def _generate_password(self, length=12):
+        alphabet = string.ascii_letters + string.digits
+        return "".join(secrets.choice(alphabet) for _ in range(length))
+
+    def generate(self, min_users=5, max_users=35):
+        count = random.randint(min_users, max_users)
+        raw_users = self._fetch_users(count)
 
         users = []
 
         for ru in raw_users:
-            # Skip minors
             if ru["dob"]["age"] < 18:
                 continue
 
             city = self.cities.get_random_city()
+            dob = datetime.fromisoformat(ru["dob"]["date"].replace("Z", "+00:00"))
 
             user = User(
                 user_id=uuid4(),
@@ -39,17 +42,13 @@ class UserGenerator:
                 first_name=ru["name"]["first"],
                 last_name=ru["name"]["last"],
                 email=ru["email"],
-                password=self.generate_password(), 
-
-                dob=datetime.fromisoformat(ru["dob"]["date"].replace("Z", "+00:00")),
-
+                password=self._generate_password(),
+                dob=dob,
                 phone=ru["phone"],
                 cell=ru["cell"],
-
                 picture_large=ru["picture"]["large"],
                 picture_medium=ru["picture"]["medium"],
-                picture_thumbnail=ru["picture"]["thumbnail"] ,
-
+                picture_thumbnail=ru["picture"]["thumbnail"],
                 city=city["city"],
                 state=city["state"],
                 state_id=city["state_id"],
@@ -60,4 +59,5 @@ class UserGenerator:
 
             users.append(user)
 
+        logger.info(f"Generated {len(users)} adult users")
         return users

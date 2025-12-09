@@ -1,11 +1,14 @@
 from dataclasses import asdict
+from datetime import datetime
+from uuid import UUID
 
 def user_to_dict(user):
-    d = asdict(user)
+    data = asdict(user)
 
-    # Ensure UUID and datetime are serializable
-    d["user_id"] = str(d["user_id"])
-    d["dob"] = d["dob"].isoformat()
-    d["created_at"] = user.created_at.isoformat()
+    for key, value in data.items():
+        if isinstance(value, datetime):
+            data[key] = value.isoformat()
+        elif isinstance(value, UUID):
+            data[key] = str(value)
 
-    return d
+    return data
