@@ -12,7 +12,7 @@ default_args = {
 }
 
 with DAG(
-    dag_id="run_dbt_spark",
+    dag_id="dbt_run",
     description="Run dbt models on Spark every 5 minutes",
     start_date=datetime(2025, 1, 1),
     schedule="*/5 * * * *",
