@@ -3,11 +3,10 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 
 SPARK_CONTAINER = "spark_streaming"
-SPARK_JOB_PATH = "/opt/airflow/jobs/create_namespaces_tables.py"
 
 with DAG(
     dag_id="create_iceberg_namespaces",
-    description="Run Spark job to create Iceberg namespaces and tables",
+    description="Run Spark DDL job (namespaces + tables) using the OOP job framework",
     start_date=datetime(2025, 1, 1),
     schedule=None,   # run manually
     catchup=False,
@@ -18,6 +17,6 @@ with DAG(
         task_id="run_schema_job",
         bash_command=(
             "docker exec spark_streaming "
-            "/opt/spark/bin/spark-submit /opt/streaming/jobs/create_namespaces_tables.py"
+            "/opt/spark/bin/spark-submit /opt/streaming/jobs/main.py --job create_ddl"
         )
     )

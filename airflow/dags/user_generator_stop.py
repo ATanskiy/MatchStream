@@ -12,14 +12,18 @@ with DAG(
     catchup=False,
     tags=["matchstream", "user_generator"],
 ):
-    
+
     stop_generator = BashOperator(
         task_id="stop_generator",
-        bash_command=f'''
-            docker exec {CONTAINER_NAME} sh -c "
-                pkill -f /app/user_generator/main.py \
-                && echo '✔ stopped' \
-                || echo 'ℹ already stopped'
-            " || true
-        '''
-        )
+        bash_command=f"""
+            (
+                echo '--- Checking running processes ---';
+                docker exec {CONTAINER_NAME} ps -ef | grep user_generator | grep -v grep || echo 'No matching process';
+
+                echo '--- Attempting kill ---';
+                docker exec {CONTAINER_NAME} pkill -f user_generator 2>&1 \
+                    && echo '✔ Process killed' \
+                    || echo 'ℹ No running process';
+            ) || true
+        """
+    )

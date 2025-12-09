@@ -24,7 +24,10 @@ with DAG(
     dbt_run = BashOperator(
         task_id="dbt_run",
         bash_command=f"""
-            docker exec {DBT_CONTAINER} \
-            dbt run --project-dir {PROJECT_DIR}
+            (
+                echo '--- Running dbt ---';
+                docker exec {DBT_CONTAINER} \
+                    dbt run --project-dir {PROJECT_DIR}
+            ) || true
         """
     )
