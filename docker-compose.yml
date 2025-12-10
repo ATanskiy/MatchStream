@@ -48,6 +48,19 @@ services:
     networks:
       - matchstream
 
+  kafka_connect:
+    image: quay.io/debezium/connect:2.7.3.Final
+    container_name: kafka_connect
+    depends_on:
+      - kafka_broker
+      - zookeeper
+    ports:
+      - "8083:8083"
+    env_file:
+      - envs/.env.kafka_connect
+    networks:
+      - matchstream
+
   # --------------------
   # Postgres, Hive Metastore 
   # --------------------
