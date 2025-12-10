@@ -17,6 +17,6 @@ with DAG(
         task_id="run_schema_job",
         bash_command=(
             "docker exec spark_streaming "
-            "/opt/spark/bin/spark-submit /opt/streaming/jobs/main.py --job create_ddl"
+            "/opt/spark/bin/spark-submit /opt/streaming/jobs/main.py --job create_schemas_tables"
         )
     )

@@ -1,7 +1,7 @@
 import yaml
 from base.spark_app import SparkApp
 
-class CreateDDLJob(SparkApp):
+class CreateSchemasTablesJob(SparkApp):
 
     def __init__(self):
         super().__init__("CreateDDLJob")

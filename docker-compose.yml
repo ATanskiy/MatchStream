@@ -54,6 +54,9 @@ services:
     depends_on:
       - kafka_broker
       - zookeeper
+    volumes:
+      - ./docker/scripts/kafka_connect_init.sh:/docker-entrypoint-init.d/kafka_connect_init.sh
+      - ./configs/debezium_writer_to_kafka:/kafka-connect-config
     ports:
       - "8083:8083"
     env_file:
