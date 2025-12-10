@@ -1,7 +1,15 @@
-WITH src AS (
+{{ config(
+    materialized='incremental',
+    incremental_strategy='merge',
+    unique_key='city_id',
+    table_type='iceberg',
+    on_schema_change='sync_all_columns'
+) }}
+
+WITH base AS (
     SELECT DISTINCT
         city AS city_name,
-        state_id AS raw_state_id,
+        state_id AS state_name_id,   -- old code passed original ID
         CAST(latitude AS DOUBLE) AS latitude,
         CAST(longitude AS DOUBLE) AS longitude,
         ingested_at
@@ -11,27 +19,32 @@ WITH src AS (
 
 joined AS (
     SELECT
-        s.city_name,
-        st.state_id,               -- surrogate key from states
-        s.raw_state_id,
-        s.latitude,
-        s.longitude,
-        s.ingested_at
-    FROM src s
+        b.city_name,
+        st.state_id,        -- THE FIX (surrogate key)
+        b.latitude,
+        b.longitude,
+        b.ingested_at
+    FROM base b
     LEFT JOIN {{ ref('dim_states') }} st
-        ON s.raw_state_id = st.state_name_id
+        ON b.state_name_id = st.state_name_id
+),
+
+ordered AS (
+    SELECT
+        city_name,
+        state_id,
+        MAX(ingested_at) AS last_ingested_at
+    FROM joined
+    GROUP BY city_name, state_id
 ),
 
 with_ids AS (
     SELECT
-        {{ dbt_utils.generate_surrogate_key(['city_name', 'state_id']) }} AS city_id,
+        ROW_NUMBER() OVER (ORDER BY state_id, city_name) AS city_id,
         city_name,
         state_id,
-        latitude,
-        longitude,
-        MAX(ingested_at) AS last_ingested_at
-    FROM joined
-    GROUP BY city_name, state_id, latitude, longitude
+        last_ingested_at
+    FROM ordered
 )
 
 SELECT *

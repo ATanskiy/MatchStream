@@ -31,14 +31,12 @@ SELECT
     p.picture_thumbnail,
 
     -- Geo (surrogate dimension values)
-    ci.city_id,
     ci.city_name,
-    st.state_id,
     st.state_name,
     st.state_name_id,
 
-    ci.latitude,
-    ci.longitude,
+    b.latitude,
+    b.longitude,
 
     -- Metadata
     m.created_at,

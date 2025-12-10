@@ -27,9 +27,10 @@ mapped AS (
     FROM src s
     LEFT JOIN {{ ref('dim_states') }} st
         ON s.state_id = st.state_name_id
+
     LEFT JOIN {{ ref('dim_cities') }} ct
         ON s.city = ct.city_name
-        AND st.state_id = ct.state_id
+        AND st.state_id = ct.state_id 
 )
 
 SELECT *
