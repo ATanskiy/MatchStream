@@ -288,7 +288,7 @@ services:
     tty: true
     stdin_open: true
 
-    # User generator python container
+  # User generator python container
   python_user_ingestor_to_writer:
     build:
       context: ./matchstream_app
