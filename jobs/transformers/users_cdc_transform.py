@@ -1,27 +1,16 @@
-# streaming/transformers/users_cdc_transform.py
-
 from pyspark.sql import functions as F
-
 
 def flatten_cdc(df):
     pl = F.col("root.payload")
 
     return df.select(
-        F.concat_ws(
-            "-",
-            F.col("topic"),
-            F.col("partition"),
-            F.col("offset")
-        ).alias("event_id"),
+        F.concat_ws("-", F.col("topic"), F.col("partition"), F.col("offset")).alias("event_id"),
         pl.op.alias("op"),
         pl.ts_ms.alias("cdc_ts_ms"),
-
         pl.source.db.alias("source_db"),
         pl.source.schema.alias("source_schema"),
         pl.source.table.alias("source_table"),
         pl.source.txId.alias("source_tx_id"),
-        pl.source.lsn.alias("source_lsn"),
-
         pl.after.id.alias("id"),
         pl.after.user_id.alias("user_id"),
         pl.after.gender.alias("gender"),
@@ -42,8 +31,6 @@ def flatten_cdc(df):
         pl.after.latitude.alias("latitude"),
         pl.after.longitude.alias("longitude"),
         F.to_timestamp(pl.after.created_at).alias("created_at"),
-
-        F.col("json_str").alias("raw_event_json"),
         F.current_timestamp().alias("ingested_at"),
     ).where(
         pl.after.isNotNull()

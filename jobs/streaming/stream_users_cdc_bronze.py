@@ -1,5 +1,3 @@
-# streaming/jobs/stream_users_cdc.py
-
 from base.spark_app import SparkApp
 from pyspark.sql import functions as F
 from schemas.cdc_users import get_envelope_schema
@@ -33,12 +31,10 @@ class StreamUsersCDCBronze(SparkApp):
                 "partition",
                 "offset",
                 F.col("timestamp").alias("kafka_timestamp"),
-                F.col("value").cast("string").alias("json_str")
-            )
+                F.col("value").cast("string").alias("json_str"))
             .select(
                 "*",
-                F.from_json("json_str", envelope_schema).alias("root")
-            )
+                F.from_json("json_str", envelope_schema).alias("root"))
         )
 
         final_df = flatten_cdc(parsed_df)

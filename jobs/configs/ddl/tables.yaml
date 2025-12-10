@@ -9,7 +9,6 @@ tables:
       source_schema: string
       source_table: string
       source_tx_id: long
-      source_lsn: long
       id: long
       user_id: string
       gender: string
@@ -30,7 +29,6 @@ tables:
       latitude: double
       longitude: double
       created_at: timestamp
-      raw_event_json: string
       ingested_at: timestamp
     partition_by:
       - day(ingested_at)
