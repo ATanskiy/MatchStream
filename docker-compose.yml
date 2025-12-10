@@ -128,19 +128,6 @@ services:
       - matchstream
     depends_on:
       - pg_writer
-
-  mongo:
-    image: mongo:7
-    container_name: mongo
-    restart: always
-    ports:
-      - "27017:27017"
-    env_file:
-      - envs/.env.mongo
-    volumes:
-      - ./volumes/mongo/data:/data/db
-    networks:
-      - matchstream
       
   # --------------------
   # Spark Streaming
