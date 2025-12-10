@@ -1,39 +1,45 @@
-# Core Spark & Data Processing
-pyspark==3.5.1
+# CORE SPARK & DATA PROCESSING
 py4j==0.10.9.7
+pandas==2.2.3
+pyspark==3.5.1
 
-# Dbt
+# DBT (Data Build Tool)
 dbt-core==1.9.3
 dbt-spark==1.9.3
 
-# Kafka Integration
+# KAFKA INTEGRATION
 kafka-python==2.2.2
 
-# Airflow (if running Airflow jobs)
+# AIRFLOW (if running Airflow jobs)
 apache-airflow==2.10.1
 apache-airflow-client==2.10.0
 
-# Hive/Trino Query Support
+# HIVE / TRINO QUERY SUPPORT
 PyHive==0.7.0
-thrift==0.16.0
-thrift-sasl==0.4.3
 pure-sasl==0.6.2
 sqlparse==0.5.3
+thrift==0.16.0
+thrift-sasl==0.4.3
 
-# Configuration & Templating
+# CONFIGURATION & TEMPLATING
 PyYAML==6.0.2
-python-dotenv  # Add this for .env file support
+python-dotenv==1.0.1
 
-# HTTP Requests
+# HTTP CLIENT
 requests==2.32.5
 
-# Data Processing
-pandas==2.2.3
-
+# DATABASE DRIVERS
 psycopg2-binary==2.9.9
 
-# For UI
+# UI / Dashboards
 streamlit==1.40.0
 
-# trino
+# TRINO CONNECTIVITY
 trino==0.328.0
+
+# MATCHSTREAM BACKEND — FASTAPI API
+bcrypt==4.1.2
+fastapi==0.115.4
+pydantic==2.7.1
+python-jose[cryptography]==3.3.0
+uvicorn==0.32.0
