@@ -2,44 +2,50 @@
     materialized='table',
     file_format='iceberg',
     table_type='iceberg',
-    on_schema_change='sync_all_columns'
+    on_schema_change='append_new_columns',
+    full_refresh=true
 ) }}
 
 WITH b AS (SELECT * FROM {{ ref('users') }}),
      c AS (SELECT * FROM {{ ref('users_contact') }}),
      p AS (SELECT * FROM {{ ref('users_picture') }}),
-     g AS (SELECT * FROM {{ ref('users_geo') }}),
-     m AS (SELECT * FROM {{ ref('users_metadata') }})
+     m AS (SELECT * FROM {{ ref('users_metadata') }}),
+     ci AS (SELECT * FROM {{ ref('dim_cities') }}),
+     st AS (SELECT * FROM {{ ref('dim_states') }})
 
 SELECT
     b.user_id,
     b.gender,
     b.first_name,
     b.last_name,
-    CONCAT(b.first_name, ' ', b.last_name) AS full_name,
+    FLOOR(DATEDIFF(current_date, b.dob) / 365) AS age,
 
-    c.email,
+    -- Contact
     c.phone,
     c.cell,
+    c.email,
 
+    -- Pictures
     p.picture_large,
     p.picture_medium,
     p.picture_thumbnail,
 
-    g.city,
-    g.state,
-    g.state_id,
-    g.postcode,
-    g.latitude,
-    g.longitude,
+    -- Geo (surrogate dimension values)
+    ci.city_id,
+    ci.city_name,
+    st.state_id,
+    st.state_name,
+    st.state_name_id,
 
+    ci.latitude,
+    ci.longitude,
+
+    -- Metadata
     m.created_at,
-    b.inserted_at,
-
-    FLOOR(DATEDIFF(current_date, TO_DATE(CAST(b.dob AS TIMESTAMP))) / 365) AS age
-
+    b.ingested_at_bronze
 FROM b
-LEFT JOIN c ON b.user_id = c.user_id
-LEFT JOIN p ON b.user_id = p.user_id
-LEFT JOIN g ON b.user_id = g.user_id
-LEFT JOIN m ON b.user_id = m.user_id
+LEFT JOIN c  ON b.user_id = c.user_id
+LEFT JOIN p  ON b.user_id = p.user_id
+LEFT JOIN m  ON b.user_id = m.user_id
+LEFT JOIN ci ON b.city_id = ci.city_id
+LEFT JOIN st ON b.state_id = st.state_id

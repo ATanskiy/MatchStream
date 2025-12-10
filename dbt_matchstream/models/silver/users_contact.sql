@@ -6,19 +6,12 @@
     on_schema_change='sync_all_columns'
 ) }}
 
-WITH src AS (
-    SELECT *
-    FROM {{ source('bronze', 'users_raw') }}
-),
+WITH src AS (SELECT * FROM {{ source('bronze', 'users_cdc') }})
 
-parsed AS (
-    SELECT
-        get_json_object(json_raw, '$.user_id') AS user_id,
-        get_json_object(json_raw, '$.email')    AS email,
-        get_json_object(json_raw, '$.phone')    AS phone,
-        get_json_object(json_raw, '$.cell')     AS cell,
-        inserted_at
-    FROM src
-)
-
-SELECT * FROM parsed
+SELECT
+    user_id,
+    email,
+    phone,
+    cell,
+    ingested_at AS ingested_at_bronze
+FROM src
