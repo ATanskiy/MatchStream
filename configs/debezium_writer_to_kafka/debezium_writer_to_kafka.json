@@ -1,0 +1,35 @@
+{
+  "name": "pg-writer-cdc",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max": "1",
+
+    "database.hostname": "pg_writer",
+    "database.port": "5432",
+    "database.user": "writer_user",
+    "database.password": "writer_pass",
+    "database.dbname": "matchstream",
+
+    "topic.prefix": "pgwriter",
+
+    "slot.name": "pgwriter_slot",
+    "publication.name": "pgwriter_pub",
+
+    "plugin.name": "pgoutput",
+
+    "snapshot.mode": "initial",
+
+    "table.include.list": "matchstream.users",
+
+    "decimal.handling.mode": "double",
+    "time.precision.mode": "adaptive_time_microseconds",
+
+    "tombstones.on.delete": "false",
+    "include.schema.changes": "false",
+
+    "transforms": "route",
+    "transforms.route.type": "org.apache.kafka.connect.transforms.RegexRouter",
+    "transforms.route.regex": ".*",
+    "transforms.route.replacement": "users_cdc"
+  }
+}

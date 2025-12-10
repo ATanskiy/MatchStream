@@ -2,69 +2,66 @@ version: 2
 
 models:
   - name: dim_users
-    description: "Denormalized user dimension combining identity, contact, pictures, geography, and metadata for BI dashboards."
-    columns:
+    description: "Denormalized dimension of users joined with contact, picture, metadata, and geo dimensions."
 
+    columns:
       - name: user_id
-        description: "Primary unique identifier for each user."
-        tests: [not_null, unique]
+        description: "Unique identifier for the user."
+        tests:
+          - not_null
+          - unique
 
       - name: gender
-        description: "User’s reported gender."
+        description: "User gender."
 
       - name: first_name
-        description: "User’s first name."
+        description: "User first name."
 
       - name: last_name
-        description: "User’s last name."
-
-      - name: full_name
-        description: "Convenience field: first name + last name."
-
-      - name: email
-        description: "Email address."
-
-      - name: phone
-        description: "Primary phone number."
-
-      - name: cell
-        description: "Secondary mobile number."
-
-      - name: picture_large
-        description: "High-resolution profile picture."
-
-      - name: picture_medium
-        description: "Medium-resolution profile picture."
-
-      - name: picture_thumbnail
-        description: "Thumbnail-sized profile picture."
-
-      - name: city
-        description: "User’s city."
-
-      - name: state
-        description: "User’s state or region name."
-
-      - name: state_id
-        description: "State abbreviation (e.g., CA)."
-
-      - name: postcode
-        description: "Postal code."
-
-      - name: latitude
-        description: "Latitude coordinate."
-
-      - name: longitude
-        description: "Longitude coordinate."
-
-      - name: created_at
-        description: "Timestamp when source system created the user."
-
-      - name: inserted_at
-        description: "Timestamp when bronze layer ingested the event."
+        description: "User last name."
 
       - name: age
-        description: "User age derived from created_at."
+        description: "Calculated age based on date of birth."
 
-      - name: region_group
-        description: "Custom grouping of states for dashboard filtering."
+      # Contact
+      - name: phone
+        description: "User phone number."
+
+      - name: cell
+        description: "User cell number."
+
+      - name: email
+        description: "User email address."
+
+      # Pictures
+      - name: picture_large
+        description: "URL to large profile picture."
+
+      - name: picture_medium
+        description: "URL to medium profile picture."
+
+      - name: picture_thumbnail
+        description: "URL to thumbnail profile picture."
+
+      # Geo
+      - name: city_name
+        description: "City name from dim_cities."
+
+      - name: state_name
+        description: "State name from dim_states."
+
+      - name: state_name_id
+        description: "State name identifier (two-letter code or similar)."
+
+      - name: latitude
+        description: "City latitude."
+
+      - name: longitude
+        description: "City longitude."
+
+      # Metadata
+      - name: created_at
+        description: "User creation datetime."
+
+      - name: ingested_at_bronze
+        description: "Timestamp when the user CDC event was ingested from bronze."
