@@ -375,6 +375,45 @@ services:
     tty: true
     stdin_open: true
 
+  # --------------------
+  # MatchStream APP Frontend and Backend
+  # --------------------
+  matchstream_backend:
+    build:
+      context: ./matchstream_app
+      dockerfile: matchstream_backend/Dockerfile.matchstream_backend
+    container_name: matchstream_backend
+    working_dir: /app
+    environment:
+      PYTHONPATH: /app
+    env_file:
+      - envs/.env.matchstream_backend
+    ports:
+      - "8010:8010"
+    networks:
+      - matchstream
+    volumes:
+      - ./matchstream_app:/app
+    tty: true
+    stdin_open: true
+
+  matchstream_frontend:
+    build:
+      context: ./matchstream_app
+      dockerfile: matchstream_frontend/Dockerfile.matchstream_frontend
+    container_name: matchstream_frontend
+    working_dir: /app/matchstream_frontend
+    environment:
+      PYTHONPATH: /app/matchstream_frontend
+    ports:
+      - "8501:8501"
+    networks:
+      - matchstream
+    volumes:
+      - ./matchstream_app:/app
+    tty: true
+    stdin_open: true
+
 networks:
   matchstream:
     driver: bridge
