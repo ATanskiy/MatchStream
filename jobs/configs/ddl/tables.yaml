@@ -1,9 +1,36 @@
 tables:
   - namespace: bronze
-    table: users_raw
+    table: users_cdc
     columns:
       event_id: string
-      json_raw: string
-      inserted_at: timestamp
+      op: string
+      cdc_ts_ms: long
+      source_db: string
+      source_schema: string
+      source_table: string
+      source_tx_id: long
+      source_lsn: long
+      id: long
+      user_id: string
+      gender: string
+      first_name: string
+      last_name: string
+      email: string
+      password: string
+      dob_days: int
+      phone: string
+      cell: string
+      picture_large: string
+      picture_medium: string
+      picture_thumbnail: string
+      city: string
+      state: string
+      state_id: string
+      postcode: string
+      latitude: double
+      longitude: double
+      created_at: timestamp
+      raw_event_json: string
+      ingested_at: timestamp
     partition_by:
-      - day(inserted_at)
+      - day(ingested_at)

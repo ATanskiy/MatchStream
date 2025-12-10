@@ -18,7 +18,7 @@ with DAG(
         bash_command=(
             "docker exec {container} "
             "/opt/spark/bin/spark-submit "
-            "/opt/streaming/jobs/main.py --job stream_users_bronze "
+            "/opt/streaming/jobs/main.py --job stream_users_cdc_bronze "
             "|| [ $? -eq 143 ] || [ $? -eq 130 ] || exit $?".format(
                 container=SPARK_CONTAINER
             )
