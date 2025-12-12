@@ -4,7 +4,7 @@ from pyspark.sql.types import (
 )
 
 
-def get_after_schema():
+def get_after_schema() -> StructType:
     return StructType([
         StructField("id", LongType(), False),
         StructField("user_id", StringType(), True),
@@ -13,7 +13,7 @@ def get_after_schema():
         StructField("last_name", StringType(), True),
         StructField("email", StringType(), True),
         StructField("password", StringType(), True),
-        StructField("dob", IntegerType(), True),
+        StructField("dob_days", IntegerType(), True),
         StructField("phone", StringType(), True),
         StructField("cell", StringType(), True),
         StructField("picture_large", StringType(), True),
@@ -29,7 +29,7 @@ def get_after_schema():
     ])
 
 
-def get_source_schema():
+def get_source_schema() -> StructType:
     return StructType([
         StructField("db", StringType(), False),
         StructField("schema", StringType(), False),
@@ -39,7 +39,7 @@ def get_source_schema():
     ])
 
 
-def get_envelope_schema():
+def get_envelope_schema() -> StructType:
     return StructType([
         StructField("schema", StructType(), True),
         StructField("payload", StructType([

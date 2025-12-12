@@ -55,14 +55,32 @@ services:
       - kafka_broker
       - zookeeper
     volumes:
-      - ./docker/scripts/kafka_connect_init.sh:/docker-entrypoint-init.d/kafka_connect_init.sh
       - ./configs/debezium_writer_to_kafka:/kafka-connect-config
     ports:
       - "8083:8083"
     env_file:
       - envs/.env.kafka_connect
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
     networks:
       - matchstream
+
+  kafka_connect_init:
+    image: curlimages/curl:latest
+    container_name: kafka_connect_init
+    depends_on:
+      kafka_connect:
+        condition: service_healthy
+    volumes:
+      - ./docker/scripts/kafka_connect/kafka_connect_init.sh:/init.sh
+      - ./configs/debezium_writer_to_kafka:/kafka-connect-config
+    networks:
+      - matchstream
+    entrypoint: ["/bin/sh", "/init.sh"]
 
   # --------------------
   # Postgres, Hive Metastore 
@@ -297,6 +315,8 @@ services:
     working_dir: /app/user_generator
     environment:
       PYTHONPATH: /app/user_generator
+    env_file:
+      - envs/.env.python_user_generator
     networks:
       - matchstream
     volumes:

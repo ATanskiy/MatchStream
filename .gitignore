@@ -13,3 +13,5 @@ envs/
 !/.env.example
 
 __pycache__/
+
+logs/

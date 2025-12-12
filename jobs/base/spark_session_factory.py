@@ -1,9 +1,11 @@
 from pyspark.sql import SparkSession
+from configs.jobs.job_config import JobConfig
 
 class SparkSessionFactory:
+    """Factory for building Spark sessions with Iceberg configurations."""
 
     @staticmethod
-    def build(config, app_name):
+    def build(config: JobConfig, app_name: str) -> SparkSession:
         return (
             SparkSession.builder
             .appName(app_name)
