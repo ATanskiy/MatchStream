@@ -7,9 +7,3 @@ BASE_DIR = Path("/opt/streaming/jobs")
 DDL_CONFIG_DIR = BASE_DIR / "configs" / "ddl"
 NAMESPACES_YAML = DDL_CONFIG_DIR / "namespaces.yaml"
 TABLES_YAML = DDL_CONFIG_DIR / "tables.yaml"
-
-# Checkpoints
-CHECKPOINT_BASE = "s3a://matchstream/checkpoints"
-
-# Other constants (add more as needed)
-KAFKA_USERS_TOPIC = "users_cdc"  # If not from env

@@ -1,7 +1,4 @@
-from pyspark.sql import functions as F
-from pyspark.sql import DataFrame
-
-from base.constants import CHECKPOINT_BASE
+from pyspark.sql import functions as F, DataFrame
 from base.spark_app import SparkApp
 from configs.jobs.job_config import JobConfig
 from schemas.cdc_users import get_envelope_schema
@@ -13,7 +10,8 @@ class StreamUsersCDCBronze(SparkApp):
 
     def __init__(self, config: JobConfig) -> None:
         super().__init__("StreamUsersCdcBronze", config)
-        self.checkpoint_location = f"{CHECKPOINT_BASE}/users_cdc_bronze"
+        self.checkpoint_location = \
+            f"{self.config.checkpoint_base}/{self.config.checkpoint_users_cdc_bronze}"
 
     def write_batch(self, df: DataFrame, batch_id: int) -> None:
         df.writeTo("matchstream.bronze.users_cdc").append()
@@ -25,7 +23,7 @@ class StreamUsersCDCBronze(SparkApp):
             self.spark.readStream
             .format("kafka")
             .option("kafka.bootstrap.servers", self.config.kafka_bootstrap)
-            .option("subscribe", self.config.kafka_users_topic)
+            .option("subscribe", self.config.kafka_users_cdc_topic)
             .load()
         )
 
