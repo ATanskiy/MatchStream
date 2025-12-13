@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from matchstream_backend.database import get_writer, get_reader
-from matchstream_backend.auth import hash_password, verify_password, create_token
+from matchstream_backend.auth import create_token
 from matchstream_backend.schemas import RegisterRequest, LoginRequest, SwipeRequest
 import uuid
 
@@ -13,13 +13,12 @@ def register(req: RegisterRequest):
     cur = conn.cursor()
 
     user_id = str(uuid.uuid4())
-    hashed = hash_password(req.password)
 
     try:
         cur.execute("""
             INSERT INTO users (id, email, password, first_name, last_name)
             VALUES (%s, %s, %s, %s, %s)
-        """, (user_id, req.email, hashed, req.first_name, req.last_name))
+        """, (user_id, req.email, req.password, req.first_name, req.last_name))
 
     except Exception:
         raise HTTPException(400, "Email already registered")
@@ -41,10 +40,13 @@ def login(req: LoginRequest):
     if not row:
         raise HTTPException(400, "Invalid login")
 
-    user_id, hashed = row
+    user_id, stored_password = row
 
-    if not verify_password(req.password, hashed):
-        raise HTTPException(400, "Wrong password")
+    if stored_password is None:
+        raise HTTPException(400, "Invalid login")
+
+    if req.password != stored_password:
+        raise HTTPException(400, "Invalid login")
 
     return {"token": create_token(str(user_id))}
 
