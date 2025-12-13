@@ -15,16 +15,27 @@ class JobConfig:
         self.kafka_users_cdc_topic: Optional[str] = os.getenv("KAFKA_USERS_CDC_TOPIC")
         self.checkpoint_base: Optional[str] = os.getenv("CHECKPOINT_BASE")
         self.checkpoint_users_cdc_bronze: Optional[str] = os.getenv("CHECKPOINT_USERS_CDC_BRONZE")
+        self.checkpoint_likes_cdc_bronze: Optional[str] = os.getenv("CHECKPOINT_LIKES_CDC_BRONZE")
+        self.checkpoint_dislikes_cdc_bronze: Optional[str] = os.getenv("CHECKPOINT_DISLIKES_CDC_BRONZE")
+        self.checkpoint_matches_cdc_bronze: Optional[str] = os.getenv("CHECKPOINT_MATCHES_CDC_BRONZE")
 
         self._validate()
 
     def _validate(self) -> None:
         """Validate required config values."""
         required = [
-            self.aws_key, self.aws_secret, self.s3_endpoint,
-            self.hive_metastore, self.catalog_type, self.kafka_bootstrap,
-            self.kafka_users_cdc_topic, self.checkpoint_base,
-            self.checkpoint_users_cdc_bronze
+            self.aws_key,
+            self.aws_secret, 
+            self.s3_endpoint,
+            self.hive_metastore, 
+            self.catalog_type, 
+            self.kafka_bootstrap,
+            self.kafka_users_cdc_topic, 
+            self.checkpoint_base,
+            self.checkpoint_users_cdc_bronze,
+            self.checkpoint_likes_cdc_bronze,
+            self.checkpoint_dislikes_cdc_bronze,
+            self.checkpoint_matches_cdc_bronze
         ]
         if any(v is None for v in required):
             raise ValueError("Missing required environment variables for JobConfig")
