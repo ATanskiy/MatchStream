@@ -1,6 +1,8 @@
-from pyspark.sql import functions as F
+from pyspark.sql import DataFrame, functions as F
 
-def flatten_cdc(df):
+
+def flatten_cdc(df: DataFrame) -> DataFrame:
+    """Flatten CDC JSON structure into a flat DataFrame."""
     pl = F.col("root.payload")
 
     return df.select(
@@ -18,7 +20,7 @@ def flatten_cdc(df):
         pl.after.last_name.alias("last_name"),
         pl.after.email.alias("email"),
         pl.after.password.alias("password"),
-        pl.after.dob.alias("dob_days"),
+        pl.after.dob_days.alias("dob_days"),
         pl.after.phone.alias("phone"),
         pl.after.cell.alias("cell"),
         pl.after.picture_large.alias("picture_large"),
