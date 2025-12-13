@@ -60,13 +60,22 @@ def discover(state: str, city: str, token: str):
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT user_id, first_name, last_name, city, state
+        SELECT
+            user_id,
+            first_name,
+            last_name,
+            email,
+            COALESCE(phone, cell) AS phone,
+            city,
+            state,
+            picture_large,
+            dob
         FROM users
         WHERE state_id=%s
         AND city=%s
         AND user_id != %s
         AND user_id NOT IN (
-        SELECT target_id FROM actions WHERE user_id=%s
+            SELECT target_id FROM actions WHERE user_id=%s
         )
         LIMIT 1
     """, (state, city, user_id, user_id))
@@ -79,8 +88,12 @@ def discover(state: str, city: str, token: str):
         "user_id": str(user[0]),
         "first_name": user[1],
         "last_name": user[2],
-        "city": user[3],
-        "state": user[4],
+        "email": user[3],
+        "phone": user[4],
+        "city": user[5],
+        "state": user[6],
+        "picture": user[7],
+        "dob": user[8],  # <-- DATE
     }
 
 
@@ -117,3 +130,42 @@ def swipe(req: SwipeRequest, token: str):
     conn.close()
 
     return {"status": "ok"}
+
+@app.get("/matches")
+def get_matches(token: str):
+    user_id = get_user_id_from_token(token)
+
+    conn = get_reader()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            u.user_id,
+            u.first_name,
+            u.last_name,
+            u.city,
+            u.state,
+            u.picture_large
+        FROM matches m
+        JOIN users u
+          ON (
+            (m.user1 = %s AND u.user_id = m.user2)
+            OR
+            (m.user2 = %s AND u.user_id = m.user1)
+          )
+    """, (user_id, user_id))
+
+    rows = cur.fetchall()
+    conn.close()
+
+    return [
+        {
+            "user_id": r[0],
+            "first_name": r[1],
+            "last_name": r[2],
+            "city": r[3],
+            "state": r[4],
+            "picture": r[5],
+        }
+        for r in rows
+    ]
