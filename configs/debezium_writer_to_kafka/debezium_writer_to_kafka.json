@@ -12,14 +12,14 @@
 
     "topic.prefix": "pgwriter",
 
+    "plugin.name": "pgoutput",
     "slot.name": "pgwriter_slot",
     "publication.name": "pgwriter_pub",
 
-    "plugin.name": "pgoutput",
-
     "snapshot.mode": "initial",
+    "snapshot.fetch.size": "2000",
 
-    "table.include.list": "matchstream.users",
+    "table.include.list": "matchstream.users,matchstream.actions,matchstream.matches",
 
     "decimal.handling.mode": "double",
     "time.precision.mode": "adaptive_time_microseconds",
@@ -27,9 +27,7 @@
     "tombstones.on.delete": "false",
     "include.schema.changes": "false",
 
-    "transforms": "route",
-    "transforms.route.type": "org.apache.kafka.connect.transforms.RegexRouter",
-    "transforms.route.regex": ".*",
-    "transforms.route.replacement": "users_cdc"
+    "heartbeat.interval.ms": "10000",
+    "slot.drop.on.stop": "false"
   }
 }

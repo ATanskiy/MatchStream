@@ -32,3 +32,38 @@ tables:
       ingested_at: timestamp
     partition_by:
       - day(ingested_at)
+      
+  - namespace: bronze
+    table: actions_cdc
+    columns:
+      event_id: string
+      op: string
+      cdc_ts_ms: long
+      source_db: string
+      source_schema: string
+      source_table: string
+      source_tx_id: long
+      user_id: string
+      target_id: string
+      action: string
+      created_at: timestamp
+      ingested_at: timestamp
+    partition_by:
+      - day(ingested_at)
+
+  - namespace: bronze
+    table: matches_cdc
+    columns:
+      event_id: string
+      op: string
+      cdc_ts_ms: long
+      source_db: string
+      source_schema: string
+      source_table: string
+      source_tx_id: long
+      user1: string
+      user2: string
+      created_at: timestamp
+      ingested_at: timestamp
+    partition_by:
+      - day(ingested_at)

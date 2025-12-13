@@ -5,12 +5,12 @@ from airflow.operators.bash import BashOperator
 CONTAINER_NAME = "spark_streaming"
 
 with DAG(
-    dag_id="stop_users_streaming",
+    dag_id="stop_all_streaming_jobs",
     description="Stop the Spark Structured Streaming ingestion job",
     start_date=datetime(2025, 1, 1),
     schedule=None,
     catchup=False,
-    tags=["matchstream", "spark", "streaming"],
+    tags=["matchstream", "spark", "streaming", "stop_jobs"],
 ):
 
     stop_streaming = BashOperator(
