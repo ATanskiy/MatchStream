@@ -13,10 +13,11 @@ class JobConfig:
         self.catalog_type: Optional[str] = os.getenv("CATALOG_TYPE")
         self.kafka_bootstrap: Optional[str] = os.getenv("KAFKA_BOOTSTRAP_SERVERS")
         self.kafka_users_cdc_topic: Optional[str] = os.getenv("KAFKA_USERS_CDC_TOPIC")
+        self.kafka_actions_cdc_topic: Optional[str] = os.getenv("KAFKA_ACTIONS_CDC_TOPIC")
+        self.kafka_matches_cdc_topic: Optional[str] = os.getenv("KAFKA_MATCHES_CDC_TOPIC")
         self.checkpoint_base: Optional[str] = os.getenv("CHECKPOINT_BASE")
         self.checkpoint_users_cdc_bronze: Optional[str] = os.getenv("CHECKPOINT_USERS_CDC_BRONZE")
-        self.checkpoint_likes_cdc_bronze: Optional[str] = os.getenv("CHECKPOINT_LIKES_CDC_BRONZE")
-        self.checkpoint_dislikes_cdc_bronze: Optional[str] = os.getenv("CHECKPOINT_DISLIKES_CDC_BRONZE")
+        self.checkpoint_actions_cdc_bronze: Optional[str] = os.getenv("CHECKPOINT_ACTIONS_CDC_BRONZE")
         self.checkpoint_matches_cdc_bronze: Optional[str] = os.getenv("CHECKPOINT_MATCHES_CDC_BRONZE")
 
         self._validate()
@@ -30,11 +31,12 @@ class JobConfig:
             self.hive_metastore, 
             self.catalog_type, 
             self.kafka_bootstrap,
-            self.kafka_users_cdc_topic, 
+            self.kafka_users_cdc_topic,
+            self.kafka_actions_cdc_topic,
+            self.kafka_matches_cdc_topic,
             self.checkpoint_base,
             self.checkpoint_users_cdc_bronze,
-            self.checkpoint_likes_cdc_bronze,
-            self.checkpoint_dislikes_cdc_bronze,
+            self.checkpoint_actions_cdc_bronze,
             self.checkpoint_matches_cdc_bronze
         ]
         if any(v is None for v in required):

@@ -27,7 +27,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     -- -------------------------------------
     CREATE TABLE IF NOT EXISTS matchstream.users (
         id               BIGSERIAL PRIMARY KEY,  -- internal PK
-        user_id          TEXT UNIQUE,            -- business key from stream
+        user_id          UUID UNIQUE NOT NULL,   -- business key from stream
         gender           VARCHAR(20),
         first_name       VARCHAR(100),
         last_name        VARCHAR(100),
@@ -48,6 +48,26 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
         created_at       TIMESTAMPTZ
         );
 
+        -- -------------------------------------
+    -- Create actions table (likes / dislikes)
+    -- -------------------------------------
+    CREATE TABLE IF NOT EXISTS matchstream.actions (
+        user_id    UUID NOT NULL,
+        target_id  UUID NOT NULL,
+        action     TEXT NOT NULL CHECK (action IN ('like', 'dislike')),
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        PRIMARY KEY (user_id, target_id)
+    );
+
+    -- -------------------------------------
+    -- Create matches table
+    -- -------------------------------------
+    CREATE TABLE IF NOT EXISTS matchstream.matches (
+        user1      UUID NOT NULL,
+        user2      UUID NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        PRIMARY KEY (user1, user2)
+    );
 
     -- -------------------------------------
     -- GRANT permissions to replica_user

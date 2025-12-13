@@ -1,8 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from matchstream_backend.database import get_writer, get_reader
-from matchstream_backend.auth import hash_password, verify_password, create_token
+from matchstream_backend.auth import create_token
 from matchstream_backend.schemas import RegisterRequest, LoginRequest, SwipeRequest
 import uuid
+from matchstream_backend.auth import get_user_id_from_token
 
 app = FastAPI(title="MatchStream Backend API")
 
@@ -13,14 +14,12 @@ def register(req: RegisterRequest):
     cur = conn.cursor()
 
     user_id = str(uuid.uuid4())
-    hashed = hash_password(req.password)
 
     try:
         cur.execute("""
-            INSERT INTO users (id, email, password, first_name, last_name)
+            INSERT INTO users (user_id, email, password, first_name, last_name)
             VALUES (%s, %s, %s, %s, %s)
-        """, (user_id, req.email, hashed, req.first_name, req.last_name))
-
+        """, (user_id, req.email, req.password, req.first_name, req.last_name))
     except Exception:
         raise HTTPException(400, "Email already registered")
 
@@ -35,32 +34,49 @@ def login(req: LoginRequest):
     conn = get_reader()
     cur = conn.cursor()
 
-    cur.execute("SELECT id, password FROM users WHERE email=%s", (req.email,))
+    cur.execute("""
+        SELECT user_id, password
+        FROM users
+        WHERE email=%s
+    """, (req.email,))
     row = cur.fetchone()
 
     if not row:
         raise HTTPException(400, "Invalid login")
 
-    user_id, hashed = row
+    user_id, stored_password = row
 
-    if not verify_password(req.password, hashed):
-        raise HTTPException(400, "Wrong password")
+    if stored_password is None or req.password != stored_password:
+        raise HTTPException(400, "Invalid login")
 
     return {"token": create_token(str(user_id))}
 
 
 @app.get("/discover")
-def discover(state: str, city: str, user_id: str):
+def discover(state: str, city: str, token: str):
+    user_id = get_user_id_from_token(token)
+
     conn = get_reader()
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT id, first_name, last_name, city, state
+        SELECT
+            user_id,
+            first_name,
+            last_name,
+            email,
+            COALESCE(phone, cell) AS phone,
+            city,
+            state,
+            picture_large,
+            dob
         FROM users
-        WHERE state=%s
+        WHERE state_id=%s
         AND city=%s
-        AND id != %s
-        AND id NOT IN (SELECT target_id FROM swipes WHERE user_id=%s)
+        AND user_id != %s
+        AND user_id NOT IN (
+            SELECT target_id FROM actions WHERE user_id=%s
+        )
         LIMIT 1
     """, (state, city, user_id, user_id))
 
@@ -69,31 +85,38 @@ def discover(state: str, city: str, user_id: str):
         return {"message": "No more users"}
 
     return {
-        "id": str(user[0]),
+        "user_id": str(user[0]),
         "first_name": user[1],
         "last_name": user[2],
-        "city": user[3],
-        "state": user[4]
+        "email": user[3],
+        "phone": user[4],
+        "city": user[5],
+        "state": user[6],
+        "picture": user[7],
+        "dob": user[8],  # <-- DATE
     }
 
 
 @app.post("/swipe")
-def swipe(user_id: str, req: SwipeRequest):
+def swipe(req: SwipeRequest, token: str):
+    user_id = get_user_id_from_token(token)
+
     conn = get_writer()
     cur = conn.cursor()
 
-    # Save swipe
     cur.execute("""
-        INSERT INTO swipes (user_id, target_id, decision)
+        INSERT INTO actions (user_id, target_id, action)
         VALUES (%s, %s, %s)
         ON CONFLICT (user_id, target_id) DO NOTHING
     """, (user_id, req.target_id, req.decision))
 
-    # Check match
     if req.decision == "like":
         cur.execute("""
-            SELECT 1 FROM swipes
-            WHERE user_id=%s AND target_id=%s AND decision='like'
+            SELECT 1
+            FROM actions
+            WHERE user_id = %s
+            AND target_id = %s
+            AND action = 'like'
         """, (req.target_id, user_id))
 
         if cur.fetchone():
@@ -107,3 +130,42 @@ def swipe(user_id: str, req: SwipeRequest):
     conn.close()
 
     return {"status": "ok"}
+
+@app.get("/matches")
+def get_matches(token: str):
+    user_id = get_user_id_from_token(token)
+
+    conn = get_reader()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            u.user_id,
+            u.first_name,
+            u.last_name,
+            u.city,
+            u.state,
+            u.picture_large
+        FROM matches m
+        JOIN users u
+          ON (
+            (m.user1 = %s AND u.user_id = m.user2)
+            OR
+            (m.user2 = %s AND u.user_id = m.user1)
+          )
+    """, (user_id, user_id))
+
+    rows = cur.fetchall()
+    conn.close()
+
+    return [
+        {
+            "user_id": r[0],
+            "first_name": r[1],
+            "last_name": r[2],
+            "city": r[3],
+            "state": r[4],
+            "picture": r[5],
+        }
+        for r in rows
+    ]

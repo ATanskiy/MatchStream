@@ -75,6 +75,8 @@ services:
     depends_on:
       kafka_connect:
         condition: service_healthy
+      pg_writer:
+        condition: service_healthy
     volumes:
       - ./docker/scripts/kafka_connect/kafka_connect_init.sh:/init.sh
       - ./configs/debezium_writer_to_kafka:/kafka-connect-config
@@ -143,6 +145,12 @@ services:
       -c max_wal_senders=10
       -c max_replication_slots=10
       -c hot_standby=on
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -p 5432 -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     networks:
       - matchstream
 

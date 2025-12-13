@@ -14,8 +14,14 @@ PG_REPLICA_URL = os.getenv("PG_REPLICA_URL")
 
 
 def get_writer():
-    return psycopg.connect(PG_WRITER_URL)
+    conn = psycopg.connect(PG_WRITER_URL)
+    with conn.cursor() as cur:
+        cur.execute("SET search_path TO matchstream")
+    return conn
 
 
 def get_reader():
-    return psycopg.connect(PG_REPLICA_URL)
+    conn = psycopg.connect(PG_REPLICA_URL)
+    with conn.cursor() as cur:
+        cur.execute("SET search_path TO matchstream")
+    return conn
