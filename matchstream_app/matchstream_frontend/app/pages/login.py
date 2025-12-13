@@ -16,7 +16,7 @@ with tab1:
         if resp.status_code == 200:
             st.session_state.token = resp.json()["token"]
             st.success("Logged in!")
-            st.switch_page("app/main.py")
+            st.switch_page("main.py")
         else:
             st.error("Invalid credentials")
 
@@ -36,6 +36,6 @@ with tab2:
         if resp.status_code == 200:
             st.session_state.token = resp.json()["token"]
             st.success("Registered!")
-            st.switch_page("app/main.py")
+            st.switch_page("main.py")
         else:
             st.error("Email already exists")

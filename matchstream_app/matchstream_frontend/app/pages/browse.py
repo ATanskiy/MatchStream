@@ -5,14 +5,17 @@ BACKEND = "http://matchstream_backend:8010"
 
 st.set_page_config(page_title="MatchStream - Browse", layout="centered")
 
-# require login + location
+# require login
 if "token" not in st.session_state or st.session_state.token is None:
-    st.warning("Please login first.")
-    st.switch_page("app/main.py")
+    st.warning("🔐 You need to log in to browse profiles.")
+    st.page_link("pages/login.py", label="👉 Go to Login / Register")
+    st.stop()
 
+# require location
 if "state" not in st.session_state or "city" not in st.session_state:
-    st.warning("Please set your location.")
-    st.switch_page("pages/setting.py")
+    st.warning("📍 Please set your location first.")
+    st.page_link("pages/setting.py", label="👉 Set Location")
+    st.stop()
 
 st.title("💘 MatchStream — Browse")
 

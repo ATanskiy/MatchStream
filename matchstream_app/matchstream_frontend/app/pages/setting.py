@@ -9,3 +9,4 @@ if st.button("Save"):
     st.session_state.state = state
     st.session_state.city = city
     st.success("Location updated!")
+    st.switch_page("pages/browse.py")
