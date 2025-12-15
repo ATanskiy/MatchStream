@@ -66,6 +66,7 @@ input:focus, textarea:focus {
   box-shadow: none !important;
 }
 
+
 /* ===== Password visibility button ===== */
 button[data-testid="stPasswordVisibilityToggle"] {
   background: transparent !important;
@@ -120,7 +121,7 @@ button[kind="primary"]:hover {
 }
 
 /* ============================= */
-/* SELECTBOX (BaseWeb) — FIX     */
+/* SELECTBOX (BaseWeb) — FIX     */
 /* ============================= */
 
 div[data-baseweb="select"] > div {
@@ -132,13 +133,8 @@ div[data-baseweb="select"] > div {
 }
 
 /* ============================= */
-/* FORCE SELECTED VALUE VISIBLE  */
+/* FORCE SELECTED VALUE VISIBLE  */
 /* ============================= */
-
-/* Nuke BaseWeb opacity */
-div[data-baseweb="select"] * {
-  opacity: 1 !important;
-}
 
 /* Force text color everywhere inside select */
 div[data-baseweb="select"] span,
@@ -150,13 +146,6 @@ div[data-baseweb="select"] div {
 /* The actual value container */
 div[data-baseweb="select"] [data-testid="value"] {
   color: #111111 !important;
-  opacity: 1 !important;
-}
-
-/* Internal input (yes, it exists) */
-div[data-baseweb="select"] input {
-  color: #111111 !important;
-  caret-color: #111111 !important;
   opacity: 1 !important;
 }
 
@@ -172,12 +161,6 @@ div[data-baseweb="select"] span {
   opacity: 1 !important;
   font-size: 16px !important;
   font-weight: 500 !important;
-}
-
-/* Caret / cursor inside selectbox */
-div[data-baseweb="select"] input {
-  color: #111111 !important;
-  caret-color: #111111 !important;
 }
 
 div[data-baseweb="select"] span[data-placeholder] {
@@ -215,15 +198,89 @@ div.stButton > button:hover {
 }
 
 /* ============================= */
-/* SLIDER — CLEAN LOOK           */
+/* SLIDER — CLEAN LOOK           */
 /* ============================= */
 
 div[data-testid="stSlider"] {
   padding-top: 6px;
 }
+
+/* ============================= */
+/* SELECTBOX (BaseWeb) — CLEAN   */
+/* ============================= */
+
+[data-testid="stSelectbox"] div[data-baseweb="select"] > div {
+  background-color: #ffffff !important;
+  border: 2px solid #111111 !important;
+  border-radius: 10px !important;
+
+  /* give letters like g/y/p room */
+  min-height: 54px !important;
+  padding: 12px 14px !important;
+
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Selected value text */
+[data-testid="stSelectbox"] div[data-baseweb="select"] [data-testid="value"] span {
+  color: #111111 !important;
+  font-weight: 500 !important;
+  font-size: 16px !important;
+  line-height: 1.4 !important;
+}
+
+/* Placeholder */
+[data-testid="stSelectbox"] div[data-baseweb="select"] span[data-placeholder] {
+  color: #6b7280 !important;
+  opacity: 1 !important;
+}
+
+/* Dropdown arrow */
+[data-testid="stSelectbox"] div[data-baseweb="select"] svg {
+  fill: #111111 !important;
+}
+
+/* 🛑 FINAL FIX: HIDES CARET/CURSOR AND ENSURES TYPED TEXT IS VISIBLE 🛑 */
+[data-testid="stSelectbox"] div[data-baseweb="select"] input[role="combobox"] {
+  caret-color: transparent !important; /* Hides the caret */
+  color: #111111 !important;          /* Ensures typed text is visible */
+  background: transparent !important; /* Hides any background */
+  padding-left: 0 !important;         /* Reset padding if necessary */
+}
+
+/* Hover */
+[data-testid="stSelectbox"] div[data-baseweb="select"] > div:hover {
+  background-color: #f9fafb !important;
+}
+
+/* 🔥 REMOVE BaseWeb typed-value chip (the fake caret / pill) */
+[data-testid="stSelectbox"]
+div[data-baseweb="select"]
+[data-testid="value"] span {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  /* 🛑 FIX: Prevent text from wrapping into multiple lines */
+  white-space: nowrap !important; 
+}
+
+/* 🔥 Kill focus ring / bubble when typing */
+[data-testid="stSelectbox"]
+div[data-baseweb="select"]
+[data-testid="value"] span:focus,
+[data-testid="stSelectbox"]
+div[data-baseweb="select"]
+[data-testid="value"] span:focus-visible {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 </style>
 """
-
 
 DARK_CSS = """
 <style>
