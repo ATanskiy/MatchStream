@@ -7,6 +7,7 @@ init_session()
 apply_theme()
 require_login()
 
+st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
 st.title("⚙️ Settings")
 
 # -----------------------------
@@ -79,7 +80,7 @@ min_age, max_age = st.slider(
 # -----------------------------
 # Save + Redirect
 # -----------------------------
-if st.button("Save settings", use_container_width=True):
+if st.button("Save settings", use_container_width=True, type="primary"):
     st.session_state.theme = theme
     st.session_state.state = state
     st.session_state.city = city

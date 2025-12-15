@@ -118,6 +118,109 @@ button[kind="primary"]:hover {
 .center {
   text-align: center;
 }
+
+/* ============================= */
+/* SELECTBOX (BaseWeb) — FIX     */
+/* ============================= */
+
+div[data-baseweb="select"] > div {
+  background-color: #ffffff !important;
+  border: 2px solid #111111 !important;
+  border-radius: 10px !important;
+  min-height: 48px !important;
+  padding: 6px 12px !important;
+}
+
+/* ============================= */
+/* FORCE SELECTED VALUE VISIBLE  */
+/* ============================= */
+
+/* Nuke BaseWeb opacity */
+div[data-baseweb="select"] * {
+  opacity: 1 !important;
+}
+
+/* Force text color everywhere inside select */
+div[data-baseweb="select"] span,
+div[data-baseweb="select"] div {
+  color: #111111 !important;
+  font-weight: 500 !important;
+}
+
+/* The actual value container */
+div[data-baseweb="select"] [data-testid="value"] {
+  color: #111111 !important;
+  opacity: 1 !important;
+}
+
+/* Internal input (yes, it exists) */
+div[data-baseweb="select"] input {
+  color: #111111 !important;
+  caret-color: #111111 !important;
+  opacity: 1 !important;
+}
+
+/* Placeholder must NOT look disabled */
+div[data-baseweb="select"] [data-placeholder] {
+  color: #111111 !important;
+  opacity: 1 !important;
+}
+
+/* Selected value text */
+div[data-baseweb="select"] span {
+  color: #111111 !important;
+  opacity: 1 !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+}
+
+/* Caret / cursor inside selectbox */
+div[data-baseweb="select"] input {
+  color: #111111 !important;
+  caret-color: #111111 !important;
+}
+
+div[data-baseweb="select"] span[data-placeholder] {
+  opacity: 1 !important;
+  color: #111111 !important;
+}
+
+/* Dropdown arrow */
+div[data-baseweb="select"] svg {
+  fill: #111111 !important;
+}
+
+/* Hover */
+div[data-baseweb="select"] > div:hover {
+  background-color: #f9fafb !important;
+}
+
+/* ============================= */
+/* BUTTON — FIX (Save settings) */
+/* ============================= */
+
+div.stButton > button {
+  background-color: #ffffff !important;
+  color: #111111 !important;
+  border: 2px solid #111111 !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  font-size: 18px !important;
+  height: 54px !important;
+}
+
+/* Hover */
+div.stButton > button:hover {
+  background-color: #f3f4f6 !important;
+}
+
+/* ============================= */
+/* SLIDER — CLEAN LOOK           */
+/* ============================= */
+
+div[data-testid="stSlider"] {
+  padding-top: 6px;
+}
 </style>
 """
 
