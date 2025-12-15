@@ -20,18 +20,15 @@ class UserService:
             )
         except Exception:
             raise HTTPException(400, "Email already registered")
-
         return AuthService.create_token(user_id)
 
     def login(self, req):
         row = self.repo.get_login(req.email)
         if not row:
             raise HTTPException(400, "Invalid login")
-
         user_id, stored_password = row
         if stored_password is None or req.password != stored_password:
             raise HTTPException(400, "Invalid login")
-
         return AuthService.create_token(str(user_id))
 
     def discover(self, user_id, state, city, gender, min_age, max_age):
@@ -43,10 +40,8 @@ class UserService:
             min_age=min_age,
             max_age=max_age,
         )
-
         if not row:
             return None
-
         return {
             "user_id": str(row[0]),
             "first_name": row[1],
