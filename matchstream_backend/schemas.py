@@ -15,4 +15,4 @@ class LoginRequest(BaseModel):
 
 class SwipeRequest(BaseModel):
     target_id: str
-    action: str
+    decision: str

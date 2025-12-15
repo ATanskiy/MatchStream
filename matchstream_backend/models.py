@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS actions (
     id SERIAL PRIMARY KEY,
     user_id UUID NOT NULL,
     target_id UUID NOT NULL,
-    action TEXT CHECK (action IN ('like', 'dislike')),
+    decision TEXT CHECK (decision IN ('like', 'dislike')),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (user_id, target_id)
 );

@@ -1,4 +1,9 @@
 import os
+
+print("DEBUG READER USER:", os.getenv("REPLICA_DB_USER"))
+print("DEBUG READER PASS:", os.getenv("REPLICA_DB_PASSWORD"))
+print("DEBUG REPLICA URL:", os.getenv("PG_REPLICA_URL"))
+
 import psycopg
 from dotenv import load_dotenv
 

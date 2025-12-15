@@ -1,0 +1,17 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir \
+        fastapi==0.115.4 \
+        uvicorn==0.32.0 \
+        python-jose[cryptography]==3.3.0 \
+        bcrypt==4.1.2 \
+        pydantic==2.7.1 \
+        python-dotenv==1.0.1 \
+        psycopg[binary]==3.1.12
+
+EXPOSE 8010
+
+# correct entrypoint
+CMD ["uvicorn", "matchstream_backend.main:app", "--host", "0.0.0.0", "--port", "8010"]

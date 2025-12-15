@@ -35,11 +35,11 @@ def discover(token: str, state: str, city: str, filters: dict | None = None) -> 
     r.raise_for_status()
     return r.json()
 
-def swipe(token: str, target_id: str, decision: str) -> None:
+def swipe(token: str, target_id: str, action: str) -> None:
     r = requests.post(
         f"{BACKEND}/swipe",
         params={"token": token},
-        json={"target_id": target_id, "decision": decision},
+        json={"target_id": target_id, "action": action},
         timeout=15,
     )
     r.raise_for_status()
