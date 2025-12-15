@@ -103,6 +103,9 @@ data = api.discover(
     token=st.session_state.token,
     state=st.session_state.state,
     city=st.session_state.city,
+    gender=st.session_state.gender,
+    min_age=st.session_state.min_age,
+    max_age=st.session_state.max_age,
 )
 
 if data.get("message"):

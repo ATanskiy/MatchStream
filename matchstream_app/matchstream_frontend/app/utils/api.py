@@ -26,12 +26,19 @@ def register(email: str, password: str, first_name: str, last_name: str) -> dict
     r.raise_for_status()
     return r.json()
 
-def discover(token: str, state: str, city: str, filters: dict | None = None) -> dict:
-    params = {"token": token, "state": state, "city": city}
-    if filters:
-        params.update(filters)
-
-    r = requests.get(f"{BACKEND}/discover", params=params, timeout=20)
+def discover(token, state, city, gender, min_age, max_age):
+    r = requests.get(
+        f"{BACKEND}/discover",
+        params={
+            "token": token,
+            "state": state,
+            "city": city,
+            "gender": gender,
+            "min_age": min_age,
+            "max_age": max_age,
+        },
+        timeout=15,
+    )
     r.raise_for_status()
     return r.json()
 

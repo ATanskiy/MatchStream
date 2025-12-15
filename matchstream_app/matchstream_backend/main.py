@@ -22,11 +22,16 @@ def login(req: LoginRequest):
 
 
 @app.get("/discover")
-def discover(state: str, city: str, token: str):
+def discover(state: str, city: str, gender: str, min_age: int, max_age: int, token: str,):
     user_id = AuthService.get_user_id_from_token(token)
-    user = user_service.discover(user_id, state, city)
-    return user or {"message": "No more users"}
-
+    return user_service.discover(
+        user_id=user_id,
+        state=state,
+        city=city,
+        gender=gender,
+        min_age=min_age,
+        max_age=max_age,
+    ) or {"message": "No more users"}
 
 @app.post("/swipe")
 def swipe(req: SwipeRequest, token: str):

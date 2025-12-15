@@ -34,8 +34,16 @@ class UserService:
 
         return AuthService.create_token(str(user_id))
 
-    def discover(self, user_id, state, city):
-        row = self.repo.discover(user_id, state, city)
+    def discover(self, user_id, state, city, gender, min_age, max_age):
+        row = self.repo.discover(
+            user_id=user_id,
+            state=state,
+            city=city,
+            gender=gender,
+            min_age=min_age,
+            max_age=max_age,
+        )
+
         if not row:
             return None
 

@@ -24,9 +24,10 @@ class UserRepository:
         conn.close()
         return row
 
-    def discover(self, user_id, state, city):
+    def discover(self, user_id, state, city, gender, min_age, max_age):
         conn = get_reader()
         cur = conn.cursor()
+
         cur.execute("""
             SELECT
                 user_id,
@@ -40,14 +41,27 @@ class UserRepository:
                 picture_large,
                 dob
             FROM users
-            WHERE state=%s
-            AND city=%s
+            WHERE state = %s
+            AND city = %s
             AND user_id != %s
+            AND gender = %s
+            AND EXTRACT(YEAR FROM AGE(dob)) BETWEEN %s AND %s
             AND user_id NOT IN (
-                SELECT target_id FROM actions WHERE user_id=%s
+                SELECT target_id
+                FROM actions
+                WHERE user_id = %s
             )
             LIMIT 1
-        """, (state, city, user_id, user_id))
+        """, (
+            state,
+            city,
+            user_id,
+            gender,
+            min_age,
+            max_age,
+            user_id,
+        ))
+
         row = cur.fetchone()
         conn.close()
         return row
