@@ -1,16 +1,14 @@
 import streamlit as st
+from utils.ui import apply_theme, init_session
 
 st.set_page_config(page_title="MatchStream", layout="centered")
+init_session()
+apply_theme()
 
 st.title("💘 MatchStream")
 st.write("Find your perfect data match 🔥")
 
-if "token" not in st.session_state:
-    st.session_state.token = None
-
 if st.session_state.token:
-    st.success("Logged in!")
-    st.page_link("pages/browse.py", label="Browse Profiles")
-    st.page_link("pages/setting.py", label="Settings")
+    st.switch_page("pages/browse.py")
 else:
-    st.page_link("pages/login.py", label="Login / Register")
+    st.switch_page("pages/login.py")
