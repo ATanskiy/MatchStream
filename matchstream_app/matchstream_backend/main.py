@@ -64,6 +64,7 @@ def discover(state: str, city: str, token: str):
             user_id,
             first_name,
             last_name,
+            gender,
             email,
             COALESCE(phone, cell) AS phone,
             city,
@@ -71,7 +72,7 @@ def discover(state: str, city: str, token: str):
             picture_large,
             dob
         FROM users
-        WHERE state_id=%s
+        WHERE state=%s
         AND city=%s
         AND user_id != %s
         AND user_id NOT IN (
@@ -88,12 +89,13 @@ def discover(state: str, city: str, token: str):
         "user_id": str(user[0]),
         "first_name": user[1],
         "last_name": user[2],
-        "email": user[3],
-        "phone": user[4],
-        "city": user[5],
-        "state": user[6],
-        "picture": user[7],
-        "dob": user[8],  # <-- DATE
+        "gender": user[3],
+        "email": user[4],
+        "phone": user[5],
+        "city": user[6],
+        "state": user[7],
+        "picture": user[8],
+        "dob": user[9],
     }
 
 
@@ -169,3 +171,65 @@ def get_matches(token: str):
         }
         for r in rows
     ]
+
+@app.get("/filters")
+def get_filters(token: str | None = None):
+    conn = get_reader()
+    cur = conn.cursor()
+
+    # States
+    cur.execute("SELECT DISTINCT state FROM users WHERE state IS NOT NULL")
+    states = sorted([r[0] for r in cur.fetchall()])
+
+    # Cities per state
+    cur.execute("""
+        SELECT state, city
+        FROM users
+        WHERE state IS NOT NULL AND city IS NOT NULL
+        GROUP BY state, city
+    """)
+    cities = {}
+    for state, city in cur.fetchall():
+        cities.setdefault(state, []).append(city)
+
+    for s in cities:
+        cities[s].sort()
+
+    # Genders
+    cur.execute("SELECT DISTINCT gender FROM users WHERE gender IS NOT NULL")
+    genders = sorted([r[0] for r in cur.fetchall()])
+
+    # Age range
+    cur.execute("""
+        SELECT
+          MIN(EXTRACT(YEAR FROM AGE(dob)))::int,
+          MAX(EXTRACT(YEAR FROM AGE(dob)))::int
+        FROM users
+        WHERE dob IS NOT NULL
+    """)
+    min_age, max_age = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    result = {
+        "states": states,
+        "cities": cities,
+        "genders": genders,
+        "age": {
+            "min": min_age,
+            "max": max_age
+        }
+    }
+
+    print("DEBUG /filters response:", result)
+
+    return {
+        "states": states,
+        "cities": cities,
+        "genders": genders,
+        "age": {
+            "min": min_age,
+            "max": max_age
+        }
+    }

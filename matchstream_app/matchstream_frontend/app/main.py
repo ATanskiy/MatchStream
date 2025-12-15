@@ -1,16 +1,60 @@
 import streamlit as st
+from utils.ui import apply_theme, init_session
 
 st.set_page_config(page_title="MatchStream", layout="centered")
+init_session()
+apply_theme()
 
 st.title("💘 MatchStream")
-st.write("Find your perfect data match 🔥")
 
-if "token" not in st.session_state:
-    st.session_state.token = None
+st.html("""
+<div class="card" style="margin-top:20px;">
+    <h3>What is MatchStream?</h3>
 
-if st.session_state.token:
-    st.success("Logged in!")
-    st.page_link("pages/browse.py", label="Browse Profiles")
-    st.page_link("pages/setting.py", label="Settings")
-else:
-    st.page_link("pages/login.py", label="Login / Register")
+    <div style="margin-top:8px; line-height:1.6;">
+        MatchStream is a real-time matchmaking application focused on fast user discovery,
+        clean user experience, and modern backend architecture.
+    </div>
+
+    <div style="margin-top:10px; line-height:1.6;">
+        The project explores how location-aware matching, session-based interaction,
+        and real-time flows can be designed and implemented in a scalable, product-oriented way.
+    </div>
+</div>
+
+<div class="card" style="margin-top:16px; padding:18px 30px;">
+    <h3>How it was built</h3>
+    <ul>
+        <li>Custom-styled Streamlit frontend focused on usability and clarity</li>
+        <li>Python backend exposing REST APIs for core application logic</li>
+        <li>Session-based authentication and state management</li>
+        <li>Location-based user discovery and filtering logic</li>
+        <li>Data engineering pipelines built with Spark</li>
+        <li>Lakehouse-style data modeling using Spark and dbt</li>
+        <li>Analytical reporting and dashboards powered by Power BI</li>
+    </ul>
+</div>
+
+<div class="card" style="margin-top:16px;">
+    <h3>About the creator</h3>
+    <div style="margin-top:8px; line-height:1.6;">
+        Built by a data engineer focused on full-stack ownership,
+        product thinking, and building end-to-end systems that connect
+        data, backend logic, and user experience.
+    </div>
+</div>
+""")
+
+
+st.markdown("<div style='height:30px'></div>", unsafe_allow_html=True)
+
+col1, col2 = st.columns(2)
+
+with col1:
+    if st.button("🔐 Login", use_container_width=True):
+        st.switch_page("pages/login.py")
+
+with col2:
+    if st.session_state.token:
+        if st.button("💖 Start Browsing", use_container_width=True):
+            st.switch_page("pages/browse.py")
