@@ -9,19 +9,12 @@ def calculate_age(dob_str: str) -> str:
     except Exception:
         return ""
 
-def profile_card_html(p: dict, photo_size_px: int = 280) -> str:
+def profile_card_html(p: dict, photo_size_px: int = 260) -> str:
     photo_url = p.get("picture") or "https://via.placeholder.com/400?text=No+Photo"
-    name = f"{p.get('first_name','')} {p.get('last_name','')}".strip()
-
-    gender = p.get("gender", "")
     age = calculate_age(p.get("dob", ""))
 
-    birthday = ""
-    try:
-        birthday = datetime.strptime(p.get("dob", ""), "%Y-%m-%d").strftime("%d %B %Y")
-    except Exception:
-        pass
-
+    gender = p.get("gender", "")
+    dob = p.get("dob", "")
     city = p.get("city", "")
     state = p.get("state", "")
     location = ", ".join([x for x in [city, state] if x])
@@ -30,31 +23,42 @@ def profile_card_html(p: dict, photo_size_px: int = 280) -> str:
     phone = p.get("phone", "")
 
     return f"""
-    <div class="center" style="margin: 14px 0 18px 0;">
+    <div class="center" style="margin: 10px 0 16px 0;">
       <img src="{photo_url}" style="
         width:{photo_size_px}px;
         height:{photo_size_px}px;
         border-radius:50%;
         object-fit:cover;
-        border: 3px solid rgba(255,255,255,0.08);
-        box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+        border: 4px solid white;
+        box-shadow: 0 14px 36px rgba(0,0,0,0.25);
       ">
     </div>
 
     <div class="card">
-      <div style="font-size:28px; font-weight:800;">About Me:</div>
+      <div style="font-size:24px; font-weight:800;">About Me:</div>
 
-      {"<div class='muted' style='margin-top:8px;'>⚧️ " + gender.capitalize() + "</div>" if gender else ""}
+      <div style="margin-top:10px;">
+        {"👤 " + gender.capitalize() if gender else ""}
+      </div>
 
-      {"<div class='muted' style='margin-top:4px;'>🎂 " + age + " years old</div>" if age else ""}
+      <div style="margin-top:6px;">
+        {"🎂 " + age + " years old" if age else ""}
+      </div>
 
-      {"<div class='muted' style='margin-top:4px;'>📅 Born on " + birthday + "</div>" if birthday else ""}
+      <div style="margin-top:6px;">
+        {"📅 Born on " + dob if dob else ""}
+      </div>
 
-      {"<div class='muted' style='margin-top:6px;'>📍 " + location + "</div>" if location else ""}
+      <div style="margin-top:6px;">
+        {"📍 " + location if location else ""}
+      </div>
 
-      <div style="margin-top:12px;">
+      <div style="margin-top:10px;">
         {"✉️ " + email if email else ""}
-        {"<br>📞 " + phone if phone else ""}
+      </div>
+
+      <div style="margin-top:6px;">
+        {"📞 " + phone if phone else ""}
       </div>
     </div>
     """

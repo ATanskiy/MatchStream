@@ -64,6 +64,7 @@ def discover(state: str, city: str, token: str):
             user_id,
             first_name,
             last_name,
+            gender,
             email,
             COALESCE(phone, cell) AS phone,
             city,
@@ -88,12 +89,13 @@ def discover(state: str, city: str, token: str):
         "user_id": str(user[0]),
         "first_name": user[1],
         "last_name": user[2],
-        "email": user[3],
-        "phone": user[4],
-        "city": user[5],
-        "state": user[6],
-        "picture": user[7],
-        "dob": user[8],  # <-- DATE
+        "gender": user[3],
+        "email": user[4],
+        "phone": user[5],
+        "city": user[6],
+        "state": user[7],
+        "picture": user[8],
+        "dob": user[9],
     }
 
 
