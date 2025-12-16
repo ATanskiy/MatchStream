@@ -1,2 +1,1 @@
-This README.md file has been added by Yaron Gibli.
-I have solved the problem
+![CI](https://github.com/<ATanskiy/MatchStream/actions/workflows/ci.yml/badge.svg)
