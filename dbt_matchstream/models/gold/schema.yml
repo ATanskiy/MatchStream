@@ -1,67 +1,93 @@
 version: 2
 
 models:
-  - name: dim_users
-    description: "Denormalized dimension of users joined with contact, picture, metadata, and geo dimensions."
-
+  - name: actions
+    description: Business-level fact table representing the latest swipe action between users
     columns:
       - name: user_id
-        description: "Unique identifier for the user."
+        description: Unique identifier of the user who performed the swipe
+        tests:
+          - not_null
+      - name: target_id
+        description: Unique identifier of the user who was swiped on
+        tests:
+          - not_null
+      - name: action
+        description: Type of swipe action performed by the user
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['like', 'dislike']
+      - name: action_at
+        description: Timestamp when the swipe action occurred
+        tests:
+          - not_null
+      - name: action_date
+        description: Date derived from the swipe timestamp for analytics and aggregation
+        tests:
+          - not_null
+
+  - name: matches
+    description: Business-level fact table representing mutual likes between two users
+    columns:
+      - name: user1
+        description: Unique identifier of the first user in the match
+        tests:
+          - not_null
+      - name: user2
+        description: Unique identifier of the second user in the match
+        tests:
+          - not_null
+      - name: matched_at
+        description: Timestamp when the mutual match was created
+        tests:
+          - not_null
+      - name: matched_date
+        description: Date derived from the match timestamp for reporting and trend analysis
+        tests:
+          - not_null
+
+  - name: dim_users
+    description: Consolidated user dimension containing demographic, contact, media, and location attributes
+    columns:
+      - name: user_id
+        description: Unique identifier of the user
         tests:
           - not_null
           - unique
-
       - name: gender
-        description: "User gender."
-
+        description: Gender of the user as provided during registration
       - name: first_name
-        description: "User first name."
-
+        description: First name of the user
       - name: last_name
-        description: "User last name."
-
+        description: Last name of the user
       - name: age
-        description: "Calculated age based on date of birth."
-
-      # Contact
+        description: Age of the user calculated from date of birth
+        tests:
+          - not_null
       - name: phone
-        description: "User phone number."
-
+        description: Landline phone number of the user if provided
       - name: cell
-        description: "User cell number."
-
+        description: Mobile phone number of the user
       - name: email
-        description: "User email address."
-
-      # Pictures
+        description: Email address associated with the user account
       - name: picture_large
-        description: "URL to large profile picture."
-
+        description: URL of the large profile picture of the user
       - name: picture_medium
-        description: "URL to medium profile picture."
-
+        description: URL of the medium-sized profile picture of the user
       - name: picture_thumbnail
-        description: "URL to thumbnail profile picture."
-
-      # Geo
+        description: URL of the thumbnail profile picture of the user
       - name: city_name
-        description: "City name from dim_cities."
-
+        description: City where the user is located
       - name: state_name
-        description: "State name from dim_states."
-
+        description: State or region where the user is located
       - name: state_name_id
-        description: "State name identifier (two-letter code or similar)."
-
+        description: Normalized identifier of the state or region
       - name: latitude
-        description: "City latitude."
-
+        description: Latitude coordinate of the user's location
       - name: longitude
-        description: "City longitude."
-
-      # Metadata
+        description: Longitude coordinate of the user's location
       - name: created_at
-        description: "User creation datetime."
-
+        description: Timestamp when the user account was created
       - name: ingested_at_bronze
-        description: "Timestamp when the user CDC event was ingested from bronze."
+        description: Timestamp when the user record was first ingested into the bronze layer

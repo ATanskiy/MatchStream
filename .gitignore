@@ -1,6 +1,5 @@
 volumes/
 .venv
-docs
 
 airflow/logs
 airflow/logs/**
