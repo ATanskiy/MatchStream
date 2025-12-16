@@ -25,9 +25,26 @@ with DAG(
         task_id="dbt_run",
         bash_command=f"""
             (
-                echo '--- Running dbt ---';
+                echo "--- Running dbt ---"
                 docker exec {DBT_CONTAINER} \
                     dbt run --project-dir {PROJECT_DIR}
-            ) || true
+            )
         """
     )
+
+    generate_docs = BashOperator(
+        task_id="generate_dbt_docs",
+        bash_command=(
+            f"docker exec {DBT_CONTAINER} "
+            f"dbt docs generate --project-dir {PROJECT_DIR}"
+        ),
+    )
+
+    fix_docs = BashOperator(
+        task_id="fix_docs_database",
+        bash_command="""
+            docker exec dbt_spark /scripts/fix_dbt_docs_database.sh
+        """,
+    )
+
+    dbt_run >> generate_docs >> fix_docs
