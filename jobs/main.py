@@ -2,7 +2,6 @@ import argparse, logging, sys
 from config.job_config import JobConfig
 from job_registry import JOB_REGISTRY
 
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="MatchStream Spark Job Runner")
     parser.add_argument("--job", required=True, help="Job name (see job_registry.py)")
@@ -31,7 +30,6 @@ def main() -> None:
             job = job_entry(config)
         else:
             job = job_entry(config=config)
-            
         job.run()
         logger.info(f"✅ Finished job: {args.job}")
     except Exception as e:
