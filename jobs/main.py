@@ -8,7 +8,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--job", required=True, help="Job name (see job_registry.py)")
     return parser.parse_args()
 
-
 def setup_logging() -> None:
     logging.basicConfig(
         level=logging.INFO,
@@ -16,27 +15,21 @@ def setup_logging() -> None:
         handlers=[logging.StreamHandler(sys.stdout)],
     )
 
-
 def main() -> None:
     setup_logging()
     logger = logging.getLogger(__name__)
-
     try:
         args = parse_args()
         if args.job not in JOB_REGISTRY:
             raise ValueError(f"Unknown job: {args.job}")
-
         config = JobConfig()
         job_entry = JOB_REGISTRY[args.job]
-        
         logger.info(f"🚀 Starting job: {args.job}")
         
         # Handle both classes and factory functions
         if callable(job_entry) and not isinstance(job_entry, type):
-            # It's a factory function
             job = job_entry(config)
         else:
-            # It's a class
             job = job_entry(config=config)
             
         job.run()
@@ -44,7 +37,6 @@ def main() -> None:
     except Exception as e:
         logger.error(f"Job failed: {e}", exc_info=True)
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()

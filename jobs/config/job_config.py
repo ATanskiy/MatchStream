@@ -9,6 +9,7 @@ class JobConfig:
         self.aws_key: Optional[str] = os.getenv("AWS_ACCESS_KEY_ID")
         self.aws_secret: Optional[str] = os.getenv("AWS_SECRET_ACCESS_KEY")
         self.s3_endpoint: Optional[str] = os.getenv("S3_ENDPOINT_URL")
+        self.spark_warehouse_dir: Optional[str] = os.getenv("SPARK_WAREHOUSE_DIR")
         self.hive_metastore: Optional[str] = os.getenv("THRIFT_HIVE_METASTORE")
         self.catalog_type: Optional[str] = os.getenv("CATALOG_TYPE")
         self.kafka_bootstrap: Optional[str] = os.getenv("KAFKA_BOOTSTRAP_SERVERS")
@@ -28,6 +29,7 @@ class JobConfig:
             "AWS_ACCESS_KEY_ID": self.aws_key,
             "AWS_SECRET_ACCESS_KEY": self.aws_secret,
             "S3_ENDPOINT_URL": self.s3_endpoint,
+            "SPARK_WAREHOUSE_DIR": self.spark_warehouse_dir,
             "THRIFT_HIVE_METASTORE": self.hive_metastore,
             "CATALOG_TYPE": self.catalog_type,
             "KAFKA_BOOTSTRAP_SERVERS": self.kafka_bootstrap,

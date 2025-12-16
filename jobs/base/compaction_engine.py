@@ -12,14 +12,14 @@ class CompactionEngine:
         self.spark.sparkContext._jvm.System.gc()
         time.sleep(2)
 
-    def rewrite_data_files(self, table: str) -> None:
+    def rewrite_data_files(self, table: str, target_file_size_bytes: int = 134217728) -> None:
         """Rewrite data files for the given table using binpack strategy."""
-        print(f"📦 Compacting {table}...")
+        print(f"📦 Compacting {table} (target={target_file_size_bytes} bytes)...")
         self.spark.sql(f"""
             CALL matchstream.system.rewrite_data_files(
                 table => '{table}',
                 strategy => 'binpack',
-                options => map('target-file-size-bytes', '134217728'))
+                options => map('target-file-size-bytes', '{target_file_size_bytes}'))
         """).show(truncate=False)
         self._gc()
 
@@ -29,10 +29,10 @@ class CompactionEngine:
         self.spark.sql(f"CALL matchstream.system.rewrite_manifests('{table}')").show()
         self._gc()
 
-    def expire_snapshots(self, table: str) -> None:
-        """Expire snapshots older than 3 days for the given table."""
-        ts = (datetime.utcnow() - timedelta(days=3)).strftime("%Y-%m-%d %H:%M:%S")
-        print(f"🕒 Expiring snapshots older than {ts}")
+    def expire_snapshots(self, table: str, older_than_days: int = 3) -> None:
+        """Expire snapshots older than N days for the given table."""
+        ts = (datetime.utcnow() - timedelta(days=older_than_days)).strftime("%Y-%m-%d %H:%M:%S")
+        print(f"🕒 Expiring snapshots older than {ts} (>{older_than_days} days)")
         self.spark.sql(f"""
             CALL matchstream.system.expire_snapshots(
                 table => '{table}', older_than => TIMESTAMP '{ts}')

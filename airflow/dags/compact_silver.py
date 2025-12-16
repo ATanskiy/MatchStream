@@ -5,12 +5,12 @@ from airflow.operators.bash import BashOperator
 SPARK_CONTAINER = "spark_streaming"
 
 with DAG(
-    dag_id="compact_bronze_users_raw",
-    description="Run Iceberg compaction for matchstream.bronze.users_raw",
+    dag_id="compact_silver",
+    description="Run full Iceberg compaction for matchstream.silver tables",
     start_date=datetime(2025, 1, 1),
     schedule=None,
     catchup=False,
-    tags=["matchstream", "iceberg", "spark", "compaction"],
+    tags=["matchstream", "iceberg", "spark", "compaction", "silver"],
 ):
 
     run_compaction = BashOperator(
@@ -18,6 +18,6 @@ with DAG(
         bash_command=(
             f"docker exec {SPARK_CONTAINER} "
             "/opt/spark/bin/spark-submit "
-            "/opt/streaming/jobs/main.py --job compact_bronze_users_raw"
-        ) + " || true"
+            "/opt/streaming/jobs/main.py --job compact_silver"
+        )
     )
