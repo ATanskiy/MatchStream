@@ -24,20 +24,25 @@ class JobConfig:
 
     def _validate(self) -> None:
         """Validate required config values."""
-        required = [
-            self.aws_key,
-            self.aws_secret, 
-            self.s3_endpoint,
-            self.hive_metastore, 
-            self.catalog_type, 
-            self.kafka_bootstrap,
-            self.kafka_users_cdc_topic,
-            self.kafka_actions_cdc_topic,
-            self.kafka_matches_cdc_topic,
-            self.checkpoint_base,
-            self.checkpoint_users_cdc_bronze,
-            self.checkpoint_actions_cdc_bronze,
-            self.checkpoint_matches_cdc_bronze
-        ]
-        if any(v is None for v in required):
-            raise ValueError("Missing required environment variables for JobConfig")
+        required = {
+            "AWS_ACCESS_KEY_ID": self.aws_key,
+            "AWS_SECRET_ACCESS_KEY": self.aws_secret,
+            "S3_ENDPOINT_URL": self.s3_endpoint,
+            "THRIFT_HIVE_METASTORE": self.hive_metastore,
+            "CATALOG_TYPE": self.catalog_type,
+            "KAFKA_BOOTSTRAP_SERVERS": self.kafka_bootstrap,
+            "KAFKA_USERS_CDC_TOPIC": self.kafka_users_cdc_topic,
+            "KAFKA_ACTIONS_CDC_TOPIC": self.kafka_actions_cdc_topic,
+            "KAFKA_MATCHES_CDC_TOPIC": self.kafka_matches_cdc_topic,
+            "CHECKPOINT_BASE": self.checkpoint_base,
+            "CHECKPOINT_USERS_CDC_BRONZE": self.checkpoint_users_cdc_bronze,
+            "CHECKPOINT_ACTIONS_CDC_BRONZE": self.checkpoint_actions_cdc_bronze,
+            "CHECKPOINT_MATCHES_CDC_BRONZE": self.checkpoint_matches_cdc_bronze,
+        }
+        
+        missing = [name for name, value in required.items() if value is None]
+        
+        if missing:
+            raise ValueError(
+                f"Missing required environment variables: {', '.join(missing)}"
+            )

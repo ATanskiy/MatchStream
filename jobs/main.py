@@ -26,11 +26,19 @@ def main() -> None:
         if args.job not in JOB_REGISTRY:
             raise ValueError(f"Unknown job: {args.job}")
 
-        config = JobConfig()  # Centralized config creation
-
-        JobClass = JOB_REGISTRY[args.job]
+        config = JobConfig()
+        job_entry = JOB_REGISTRY[args.job]
+        
         logger.info(f"🚀 Starting job: {args.job}")
-        job = JobClass(config=config)  # Inject config
+        
+        # Handle both classes and factory functions
+        if callable(job_entry) and not isinstance(job_entry, type):
+            # It's a factory function
+            job = job_entry(config)
+        else:
+            # It's a class
+            job = job_entry(config=config)
+            
         job.run()
         logger.info(f"✅ Finished job: {args.job}")
     except Exception as e:

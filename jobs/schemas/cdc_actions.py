@@ -11,7 +11,6 @@ def get_after_schema() -> StructType:
         StructField("created_at", StringType(), True),
     ])
 
-
 def get_source_schema() -> StructType:
     return StructType([
         StructField("db", StringType(), False),
@@ -20,7 +19,6 @@ def get_source_schema() -> StructType:
         StructField("txId", LongType(), True),
         StructField("lsn", LongType(), True),
     ])
-
 
 def get_envelope_schema() -> StructType:
     return StructType([
