@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from configs.jobs.job_config import JobConfig
+from config.job_config import JobConfig
 
 class SparkSessionFactory:
     """Factory for building Spark sessions with Iceberg configurations."""
@@ -13,7 +13,7 @@ class SparkSessionFactory:
             .config("spark.sql.catalog.matchstream", "org.apache.iceberg.spark.SparkCatalog")
             .config("spark.sql.catalog.matchstream.type", config.catalog_type)
             .config("spark.sql.catalog.matchstream.uri", config.hive_metastore)
-            .config("spark.sql.catalog.matchstream.warehouse", "s3a://matchstream/")
+            .config("spark.sql.catalog.matchstream.warehouse", config.spark_warehouse_dir)
             .config("spark.sql.catalog.matchstream.io-impl", "org.apache.iceberg.hadoop.HadoopFileIO")
             .config("spark.hadoop.fs.s3a.endpoint", config.s3_endpoint)
             .config("spark.hadoop.fs.s3a.access.key", config.aws_key)

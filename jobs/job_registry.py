@@ -1,15 +1,18 @@
-from ddl.create_schemas_tables import CreateSchemasTablesJob
-from maintenance.compact_bronze_users_raw import CompactBronzeUsersRaw
-from maintenance.compact_silver_all import CompactSilverAll
-from streaming.stream_users_cdc_bronze import StreamUsersCDCBronze
-from streaming.stream_actions_cdc_bronze import StreamActionsCDCBronze
-from streaming.stream_matches_cdc_bronze import StreamMatchesCDCBronze
+# job_registry.py
+from jobs.ddl.create_schemas_tables import CreateSchemasTablesJob
+from job_factories import (
+    create_compact_bronze_job,
+    create_compact_silver_job,
+    create_users_cdc_job,
+    create_actions_cdc_job,
+    create_matches_cdc_job
+)
 
 JOB_REGISTRY = {
-    "compact_bronze_users_raw": CompactBronzeUsersRaw,
-    "compact_silver_all": CompactSilverAll,
-    "stream_users_cdc_bronze": StreamUsersCDCBronze,
-    "stream_actions_cdc_bronze": StreamActionsCDCBronze,
-    "stream_matches_cdc_bronze": StreamMatchesCDCBronze,
+    "compact_bronze": create_compact_bronze_job,
+    "compact_silver": create_compact_silver_job,
+    "stream_users_cdc_bronze": create_users_cdc_job,
+    "stream_actions_cdc_bronze": create_actions_cdc_job,
+    "stream_matches_cdc_bronze": create_matches_cdc_job,
     "create_schemas_tables": CreateSchemasTablesJob,
 }
