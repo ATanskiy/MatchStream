@@ -25,9 +25,10 @@ with DAG(
         task_id="dbt_run",
         bash_command=f"""
             (
-                echo '--- Running dbt ---';
+                echo "--- Running dbt ---"
                 docker exec {DBT_CONTAINER} \
                     dbt run --project-dir {PROJECT_DIR}
+            )
         """
     )
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-CATALOG_NAME="youtube_trends"
+CATALOG_NAME="matchstream"
 TARGET_DIR="/workspace/target"
 
 echo "🔧 Fixing dbt docs: database + schema-aware lineage"
@@ -18,7 +18,7 @@ import json
 import sys
 import os
 
-CATALOG_NAME = "youtube_trends"
+CATALOG_NAME = "matchstream"
 TARGET_DIR = "/workspace/target"
 
 # Only apply schema prefixes to these schemas
