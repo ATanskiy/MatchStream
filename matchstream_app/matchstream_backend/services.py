@@ -70,4 +70,15 @@ class SwipeService:
             self.repo.insert_match(user_id, target_id)
 
     def matches(self, user_id: str):
-        return self.repo.get_matches(user_id)
+        rows = self.repo.get_matches(user_id)
+        return [
+            {
+                "user_id": str(r[0]),
+                "first_name": r[1],
+                "last_name": r[2],
+                "city": r[3],
+                "state": r[4],
+                "picture": r[5],
+            }
+            for r in rows
+        ]
