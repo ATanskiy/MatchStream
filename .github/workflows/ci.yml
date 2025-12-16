@@ -8,23 +8,49 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
 
-      - name: Set up Python
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Set PYTHONPATH
+      - name: 🧠 Set PYTHONPATH
         run: |
           echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
 
-      - name: Run tests
+      - name: 🧪 Backend tests
         run: |
-          pytest tests/ -v
+          echo "🔧 Running backend tests"
+          pytest tests/matchstream_backend -v --cov=matchstream_app --cov-report=term-missing
+
+      - name: 🎨 Frontend tests
+        run: |
+          echo "🎨 Running frontend tests"
+          pytest tests/matchstream_frontend -v --cov=matchstream_app --cov-report=term-missing
+
+      - name: 🧬 User generator tests
+        run: |
+          echo "🧬 Running user generator tests"
+          pytest tests/user_generator -v --cov=matchstream_app --cov-report=term-missing
+
+      - name: 🛠️ Ingestor / Writer tests
+        run: |
+          echo "🛠️ Running ingestor-to-writer tests"
+          pytest tests/user_ingestor_to_writer -v --cov=matchstream_app --cov-report=term-missing
+
+      - name: 😈 CI failed
+        if: failure()
+        run: |
+          echo "💥 MatchStream CI failed. Fix it before pushing again."
