@@ -68,3 +68,6 @@ class SwipeService:
 
         if action == "like" and self.repo.is_mutual_like(user_id, target_id):
             self.repo.insert_match(user_id, target_id)
+
+    def matches(self, user_id: str):
+        return self.repo.get_matches(user_id)
