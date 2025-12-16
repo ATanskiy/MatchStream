@@ -1,9 +1,9 @@
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 import yaml
-from base.constants import NAMESPACES_YAML, TABLES_YAML
+from config.constants import NAMESPACES_YAML, TABLES_YAML
 from base.spark_app import SparkApp
-from configs.jobs.job_config import JobConfig
+from config.job_config import JobConfig
 
 
 class CreateSchemasTablesJob(SparkApp):

@@ -1,5 +1,5 @@
 import argparse, logging, sys
-from configs.jobs.job_config import JobConfig
+from config.job_config import JobConfig
 from job_registry import JOB_REGISTRY
 
 

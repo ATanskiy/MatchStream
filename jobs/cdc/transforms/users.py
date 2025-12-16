@@ -1,8 +1,7 @@
 from pyspark.sql import DataFrame, functions as F
 
-
 def flatten_cdc(df: DataFrame) -> DataFrame:
-    """Flatten CDC JSON structure into a flat DataFrame."""
+    """Flatten users CDC JSON structure into a flat DataFrame."""
     pl = F.col("root.payload")
 
     return df.select(

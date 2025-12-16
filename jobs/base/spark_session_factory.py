@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from configs.jobs.job_config import JobConfig
+from config.job_config import JobConfig
 
 class SparkSessionFactory:
     """Factory for building Spark sessions with Iceberg configurations."""

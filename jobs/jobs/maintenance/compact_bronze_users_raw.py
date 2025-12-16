@@ -1,6 +1,6 @@
 from base.compaction_engine import CompactionEngine
 from base.spark_app import SparkApp
-from configs.jobs.job_config import JobConfig
+from config.job_config import JobConfig
 
 
 class CompactBronzeUsersRaw(SparkApp):

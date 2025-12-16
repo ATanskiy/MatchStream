@@ -1,6 +1,6 @@
 import signal
 from base.logging_mixin import LoggingMixin
-from configs.jobs.job_config import JobConfig
+from config.job_config import JobConfig
 from base.spark_session_factory import SparkSessionFactory
 
 

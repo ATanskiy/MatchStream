@@ -1,7 +1,7 @@
 # job_registry.py
-from ddl.create_schemas_tables import CreateSchemasTablesJob
-from maintenance.compact_bronze_users_raw import CompactBronzeUsersRaw
-from maintenance.compact_silver_all import CompactSilverAll
+from jobs.ddl.create_schemas_tables import CreateSchemasTablesJob
+from jobs.maintenance.compact_bronze_users_raw import CompactBronzeUsersRaw
+from jobs.maintenance.compact_silver_all import CompactSilverAll
 from job_factories import (
     create_users_cdc_job,
     create_actions_cdc_job,

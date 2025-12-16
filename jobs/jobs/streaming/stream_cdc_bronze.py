@@ -1,7 +1,7 @@
 from pyspark.sql import DataFrame, functions as F
 from typing import Callable
 from base.spark_app import SparkApp
-from configs.jobs.job_config import JobConfig
+from config.job_config import JobConfig
 from pyspark.sql.types import StructType
 
 
