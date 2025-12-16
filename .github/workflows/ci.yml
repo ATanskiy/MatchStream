@@ -50,6 +50,11 @@ jobs:
           echo "🛠️ Running ingestor-to-writer tests"
           pytest tests/user_ingestor_to_writer -v --cov=matchstream_app --cov-report=term-missing
 
+      - name: ⚡ Spark tests
+        run: |
+          echo "⚡ Running spark tests"
+          pytest tests/jobs -v --cov=matchstream_app --cov-report=term-missing
+
       - name: 😈 CI failed
         if: failure()
         run: |
