@@ -13,7 +13,7 @@ def get_after_schema() -> StructType:
         StructField("last_name", StringType(), True),
         StructField("email", StringType(), True),
         StructField("password", StringType(), True),
-        StructField("dob_days", IntegerType(), True),
+        StructField("dob", IntegerType(), True),
         StructField("phone", StringType(), True),
         StructField("cell", StringType(), True),
         StructField("picture_large", StringType(), True),

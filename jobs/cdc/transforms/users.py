@@ -19,7 +19,7 @@ def flatten_cdc(df: DataFrame) -> DataFrame:
         pl.after.last_name.alias("last_name"),
         pl.after.email.alias("email"),
         pl.after.password.alias("password"),
-        pl.after.dob_days.alias("dob_days"),
+        pl.after.dob.alias("dob_days"),
         pl.after.phone.alias("phone"),
         pl.after.cell.alias("cell"),
         pl.after.picture_large.alias("picture_large"),
