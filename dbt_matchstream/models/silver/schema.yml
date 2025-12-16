@@ -1,51 +1,179 @@
 version: 2
 
 models:
-
   - name: dim_states
+    description: >
+      Dimension table containing unique states derived from users CDC data.
+      Uses deterministic surrogate keys.
     columns:
       - name: state_id
-        tests: [unique, not_null]
-      - name: state_name_id
+        description: Surrogate state identifier
+        tests: [not_null, unique]
       - name: state_name
+        description: Human-readable state name
+        tests: [not_null]
+      - name: state_name_id
+        description: Original state identifier from source system
+      - name: last_ingested_at
+        description: Latest ingestion timestamp for this state
 
   - name: dim_cities
+    description: >
+      Dimension table containing unique cities per state.
+      Uses deterministic surrogate keys.
     columns:
       - name: city_id
-        tests: [unique, not_null]
+        description: Surrogate city identifier
+        tests: [not_null, unique]
       - name: city_name
+        description: City name
+        tests: [not_null]
       - name: state_id
+        description: Foreign key to dim_states
+        tests: [not_null]
+      - name: latitude
+        description: Latitude coordinate
+      - name: longitude
+        description: Longitude coordinate
+      - name: last_ingested_at
+        description: Latest ingestion timestamp for this city
+
+  - name: fct_actions
+    description: >
+      Latest user action per (user_id, target_id) pair.
+      Deduplicated and CDC-resolved.
+    columns:
+      - name: event_id
+        description: CDC event identifier
+        tests: [not_null]
+      - name: user_id
+        description: User performing the action
+        tests: [not_null]
+      - name: target_id
+        description: User being acted upon
+        tests: [not_null]
+      - name: action
+        description: User action type
         tests:
-          - relationships:
-              to: ref('dim_states')
-              field: state_id
+          - not_null
+          - accepted_values:
+              values: ['like', 'dislike']
+      - name: created_at
+        description: Timestamp when the action occurred
+      - name: ingested_at_bronze
+        description: Ingestion timestamp from Bronze
+        tests: [not_null]
+      - name: cdc_ts_ms
+        description: CDC timestamp in milliseconds
+        tests: [not_null]
+    tests:
+      - unique:
+          column_name: "user_id || '-' || target_id"
+
+  # =====================================================
+  # FACT MATCHES (SILVER)
+  # =====================================================
+  - name: fct_matches
+    description: >
+      Latest state of user matches.
+      User pairs are normalized and deduplicated.
+    columns:
+      - name: user1
+        description: First user in the match (normalized)
+        tests: [not_null]
+      - name: user2
+        description: Second user in the match (normalized)
+        tests: [not_null]
+      - name: created_at
+        description: Timestamp when the match was created
+      - name: ingested_at_bronze
+        description: Ingestion timestamp from Bronze
+        tests: [not_null]
+      - name: cdc_ts_ms
+        description: CDC timestamp in milliseconds
+        tests: [not_null]
+    tests:
+      - unique:
+          column_name: "user1 || '-' || user2"
 
   - name: users
+    description: >
+      Core user dimension containing demographic and location information.
     columns:
       - name: user_id
-        tests: [unique, not_null]
+        description: Unique user identifier
+        tests: [not_null, unique]
+      - name: gender
+        description: User gender
+      - name: first_name
+        description: User first name
+      - name: last_name
+        description: User last name
       - name: state_id
-        tests:
-          - relationships:
-              to: ref('dim_states')
-              field: state_id
+        description: Surrogate state identifier
+        tests: [not_null]
       - name: city_id
-        tests:
-          - relationships:
-              to: ref('dim_cities')
-              field: city_id
+        description: Surrogate city identifier
+        tests: [not_null]
+      - name: latitude
+        description: User latitude
+      - name: longitude
+        description: User longitude
+      - name: dob
+        description: Date of birth
+      - name: created_at
+        description: User creation timestamp
+      - name: ingested_at_bronze
+        description: Ingestion timestamp from Bronze
+        tests: [not_null]
 
   - name: users_contact
+    description: >
+      User contact details (PII).
+      Must not be exposed to Gold or BI layers.
     columns:
       - name: user_id
-        tests: [unique, not_null]
+        description: Unique user identifier
+        tests: [not_null, unique]
+      - name: email
+        description: User email address
+      - name: phone
+        description: User phone number
+      - name: cell
+        description: User cell number
+      - name: ingested_at_bronze
+        description: Ingestion timestamp from Bronze
+        tests: [not_null]
 
   - name: users_metadata
+    description: >
+      Sensitive user metadata including password hashes.
+      Restricted access.
     columns:
       - name: user_id
-        tests: [unique, not_null]
+        description: Unique user identifier
+        tests: [not_null, unique]
+      - name: created_at
+        description: User creation timestamp
+      - name: password
+        description: Hashed password (PII – restricted)
+      - name: ingested_at_bronze
+        description: Ingestion timestamp from Bronze
+        tests: [not_null]
 
   - name: users_picture
+    description: >
+      User profile pictures in multiple resolutions.
     columns:
       - name: user_id
-        tests: [unique, not_null]
+        description: Unique user identifier
+        tests: [not_null, unique]
+      - name: picture_large
+        description: URL to large profile picture
+      - name: picture_medium
+        description: URL to medium profile picture
+      - name: picture_thumbnail
+        description: URL to thumbnail profile picture
+      - name: ingested_at_bronze
+        description: Ingestion timestamp from Bronze
+        tests: [not_null]

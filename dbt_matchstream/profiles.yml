@@ -7,6 +7,6 @@ dbt_matchstream:
       host: spark-thriftserver
       port: 10001
       catalog: matchstream
-      schema: matchstream.silver
+      schema: silver
       threads: 10
       auth: NOSASL

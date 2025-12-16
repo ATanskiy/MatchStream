@@ -384,7 +384,7 @@ services:
     container_name: dbt_spark
     volumes:
       - ./dbt_matchstream:/workspace
-      - ./volumes/.dbt/dbt_docs:/workspace/target
+      - ./docs:/workspace/target
       - ./volumes/.dbt/dbt_logs:/workspace/logs
       - ./docker/scripts/dbt:/scripts
     environment:
@@ -402,7 +402,7 @@ services:
     ports:
       - "8088:80"
     volumes:
-      - ./volumes/.dbt/dbt_docs:/usr/share/nginx/html:ro
+      - ./docs:/usr/share/nginx/html:ro
     restart: unless-stopped
 
   # --------------------
